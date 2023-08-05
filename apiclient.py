@@ -4,13 +4,12 @@ import requests
 
 from utils import Config
 
-config = Config()
-
 
 class ApiClient:
 
-    def __init__(self):
+    def __init__(self, config):
         self.logger = logging.getLogger('api-client')
+        self.config = config
         self.headers = {
             'Accept': 'application/json, text/plain, */*',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -54,8 +53,7 @@ class ApiClient:
             print(f'- {player_name}, {player_team}, {player_slug}, {player_status}, {player_value}, {player_points}')
 
 
-
-
 if __name__ == "__main__":
-    web_client = ApiClient()
+    config = Config()
+    web_client = ApiClient(config)
     web_client.get_players()
