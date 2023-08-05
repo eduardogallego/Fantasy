@@ -57,8 +57,10 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/data.json', methods=['GET'])
+@app.route('/operations.json', methods=['GET'])
 def data():
+
+
     return """[
   {"id": 1, "name": "Edu", "price": 1000},
   {"id": 2, "name": "Blanca", "price": 2000},

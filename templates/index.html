@@ -7,14 +7,17 @@
 {% block card_body %}
 <table
   data-toggle="table"
-  data-url="data.json"
+  data-url="operations.json"
   data-pagination="true"
   data-search="true">
   <thead>
     <tr>
-      <th data-sortable="true" data-field="id">Item ID</th>
-      <th data-field="name">Item Name</th>
-      <th data-field="price">Item Price</th>
+      <th data-sortable="true" data-field="name">Player</th>
+      <th data-sortable="true" data-field="pos">Position</th>
+      <th data-sortable="true" data-field="buy_tt">Buy TT</th>
+      <th data-sortable="true" data-field="buy_value">Buy Value</th>
+      <th data-sortable="true" data-field="sell_tt">Sell TT</th>
+      <th data-sortable="true" data-field="sell_value">Sell Value</th>
     </tr>
   </thead>
 </table>
