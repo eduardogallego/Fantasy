@@ -45,12 +45,13 @@ class ApiClient:
         print(f'{manager} - Cash: {team_money}, Team ({team_players}): {team_value}, Points {team_points}')
         for player in response_dict['players']:
             player_name = player['playerMaster']['nickname']
+            player_position = player['playerMaster']['positionId']
             player_value = player['buyoutClause']
             player_status = player['playerMaster']['playerStatus']
-            player_team = player['playerMaster']['team']['name']
-            player_slug = player['playerMaster']['team']['slug']
+            player_team = player['playerMaster']['team']['slug']
             player_points = player['playerMaster']['points']
-            print(f'- {player_name}, {player_team}, {player_slug}, {player_status}, {player_value}, {player_points}')
+            print(f'- {player_name}, {player_position}, {player_team}, '
+                  f'{player_status}, {player_value}, {player_points}')
 
 
 if __name__ == "__main__":

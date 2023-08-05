@@ -57,6 +57,16 @@ def index():
     return render_template("index.html")
 
 
+@app.route('/data.json', methods=['GET'])
+def data():
+    return """[
+  {"id": 1, "name": "Edu", "price": 1000},
+  {"id": 2, "name": "Blanca", "price": 2000},
+  {"id": 3, "name": "Marta", "price": 3000},
+  {"id": 4, "name": "Emma", "price": 4000},
+  {"id": 5, "name": "Alvaro", "price": 5000}]"""
+
+
 @app.route('/favicon.ico', methods=['GET'])
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'images'),

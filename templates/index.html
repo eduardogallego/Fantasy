@@ -5,5 +5,17 @@
 {% endblock %}
 
 {% block card_body %}
-<div id='index'>Edu was here</div>
+<table
+  data-toggle="table"
+  data-url="data.json"
+  data-pagination="true"
+  data-search="true">
+  <thead>
+    <tr>
+      <th data-sortable="true" data-field="id">Item ID</th>
+      <th data-field="name">Item Name</th>
+      <th data-field="price">Item Price</th>
+    </tr>
+  </thead>
+</table>
 {% endblock %}
