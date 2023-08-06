@@ -2,6 +2,7 @@ import logging
 import os
 
 from apiclient import ApiClient
+from database import Database
 from datetime import timedelta
 from flask import Flask, redirect, render_template, request, send_from_directory
 from flask_login import LoginManager, login_required, login_user
@@ -51,22 +52,16 @@ def root():
     return redirect("/index")
 
 
-@app.route('/index', methods=['GET'])
+@app.route('/operations', methods=['GET'])
 @login_required
-def index():
-    return render_template("index.html")
+def operations():
+    return render_template("operations.html")
 
 
 @app.route('/operations.json', methods=['GET'])
-def data():
-
-
-    return """[
-  {"id": 1, "name": "Edu", "price": 1000},
-  {"id": 2, "name": "Blanca", "price": 2000},
-  {"id": 3, "name": "Marta", "price": 3000},
-  {"id": 4, "name": "Emma", "price": 4000},
-  {"id": 5, "name": "Alvaro", "price": 5000}]"""
+def operations_json():
+    database = Database(config)
+    return database.get_operations()
 
 
 @app.route('/favicon.ico', methods=['GET'])
@@ -78,6 +73,11 @@ def favicon():
 @app.route('/images/<image>', methods=['GET'])
 def get_image(image):
     return send_from_directory(os.path.join(app.root_path, 'images'), image)
+
+
+@app.route('/web/<resource>', methods=['GET'])
+def get_resource(resource):
+    return send_from_directory(os.path.join(app.root_path, 'web'), resource)
 
 
 debug_mode = config.get('debug_mode') == 'True'

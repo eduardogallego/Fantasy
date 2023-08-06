@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block head %}
+<meta http-equiv="refresh" content="300">
+{% endblock %}
+
+{% block card_body %}
+<script src=”web/javascript.js”></script>
+<table
+  data-toggle="table"
+  data-url="operations.json"
+  data-pagination="true"
+  data-search="true">
+  <thead>
+    <tr>
+      <th data-sortable="true" data-field="name">Player</th>
+      <th data-sortable="true" data-field="pos" data-formatter="positionFormatter" class="center">Pos</th>
+      <th data-sortable="true" data-field="buy_tt" class="right">Buy TT</th>
+      <th data-sortable="true" data-field="buy_value" class="right">Buy Value</th>
+      <th data-sortable="true" data-field="sale_tt" class="right">Sale TT</th>
+      <th data-sortable="true" data-field="sale_value" class="right">Sale Value</th>
+      <th data-sortable="true" data-field="benefit" class="right">Benefit</th>
+      <th data-sortable="true" data-field="percent" class="right">Percent</th>
+    </tr>
+  </thead>
+</table>
+<script>
+  function positionFormatter(value, row) {
+    var position = 'POR';
+    if (value === 2) {
+        position = 'DEF';
+    } else if (value === 3) {
+        position = 'CEN';
+    } else if (value === 4) {
+        position = 'DEL';
+    }
+    return '<span class="position pos-' + value + '">' + position + '</span>';
+  }
+</script>
+{% endblock %}

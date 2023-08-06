@@ -1,8 +1,9 @@
+import json
 import logging
 import sqlite3
 
 from apiclient import ApiClient
-from datetime import datetime, timedelta
+from datetime import datetime
 from sqlite3 import Error
 from utils import Config
 
@@ -27,8 +28,15 @@ class Database:
         cursor.execute("SELECT name, pos, buy_tt, buy_value, sale_tt, sale_value FROM operations "
                        "WHERE sale_tt IS NOT NULL ORDER BY sale_tt DESC, buy_tt DESC")
         rows = cursor.fetchall()
+        result = []
         for row in rows:
-            print(row)
+            result.append({"name": row[0], "pos": row[1], "buy_tt": datetime.fromisoformat(row[2]).strftime('%d-%m-%y'),
+                           "buy_value": '{0:.2f}'.format(round(row[3] / 1000000, 2)),
+                           "sale_tt": datetime.fromisoformat(row[4]).strftime('%d-%m-%y'),
+                           "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
+                           "benefit": '{0:.2f}'.format(round((row[5] - row[3]) / 1000000, 2)),
+                           "percent": f"{round((row[5] - row[3]) * 100 / row[3], 0)}%"})
+        return json.dumps(result)
 
     def update_operations(self):
         cursor = self.connection.cursor()
@@ -61,5 +69,5 @@ class Database:
 if __name__ == "__main__":
     configuration = Config()
     database = Database(configuration)
-    database.update_operations()
+    # database.update_operations()
     database.get_operations()
