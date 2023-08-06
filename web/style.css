@@ -1,26 +1,68 @@
-.position {
-    color: white;
-    display: inline-block;
-    font-size: 0.8em;
-    text-align: center;
-    width: 40px;
-}
-.pos-1 {
-    background: red;
-}
-.pos-2 {
-    background: purple;
-}
-.pos-3 {
-    background: blue;
-}
-.pos-4 {
-    background: orange;
-}
-
 .center {
     text-align: center;
 }
 .right {
     text-align: right;
+}
+
+.position {
+    color: white;
+    display: inline-block;
+    font-size: 0.8em;
+    height: 20px;
+    text-align: center;
+    width: 40px;
+}
+.pos-1 {
+    background-color: red;
+}
+.pos-2 {
+    background-color: purple;
+}
+.pos-3 {
+    background-color: blue;
+}
+.pos-4 {
+    background-color: orange;
+}
+
+.team {
+    background-color: grey;
+    color: white;
+    display: inline-block;
+    font-size: 0.8em;
+    height: 20px;
+    text-align: center;
+    width: 40px;
+}
+.team-ATM {
+    background-color: red;
+}
+.team-MAL, .team-OSA {
+    background-color: red;
+    color: black;
+}
+.team-RSO {
+    background-color: blue;
+}
+.team-RMA {
+    background-color: purple;
+}
+.team-VAL {
+    background-color: white;
+    color: black;
+    border: 1px solid grey;
+}
+
+.status {
+    background-color: grey;
+    color: white;
+    display: inline-block;
+    font-size: 0.8em;
+    height: 20px;
+    text-align: center;
+    width: 40px;
+}
+.status-UNK {
+    background-color: orange;
 }

@@ -23,9 +23,6 @@ class Database:
         except Error as e:
             self.logger.ERROR("Database Error: " + e)
 
-    def get_players(self):
-        return []
-
     def get_operations(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, pos, buy_tt, buy_value, sale_tt, sale_value FROM operations "
@@ -43,13 +40,17 @@ class Database:
 
     def get_players(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, team, pos, status, sale_value, points FROM players "
-                       "ORDER BY pos ASC, sale_value DESC")
+        cursor.execute("SELECT name, team, pos, status, buy_tt, buy_value, sale_value, points "
+                       "FROM players ORDER BY pos ASC, sale_value DESC")
         rows = cursor.fetchall()
         result = []
         for row in rows:
             result.append({"name": row[0], "team": row[1], "pos": row[2], "status": row[3],
-                           "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "points": row[5]})
+                           "buy_tt": datetime.fromisoformat(row[4]).strftime('%d-%m-%y'),
+                           "buy_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
+                           "sale_value": '{0:.2f}'.format(round(row[6] / 1000000, 2)),
+                           "benefit": '{0:.2f}'.format(round((row[6] - row[5]) / 1000000, 2)),
+                           "percent": round((row[6] - row[5]) * 100 / row[5], 0), "points": row[7]})
         return json.dumps(result)
 
     def update_operations(self):
@@ -81,13 +82,20 @@ class Database:
     def update_players(self):
         cursor = self.connection.cursor()
         team, players = self.api_client.get_players()
+        players_db = []
+        for player in players:
+            cursor.execute(f"SELECT buy_tt, buy_value FROM operations "
+                           f"WHERE player_id = {player[0]} AND sale_tt IS NULL")
+            row = cursor.fetchone()
+            players_db.append((player[0], player[1], player[2], player[3], player[4],
+                               row[0], row[1], player[5], player[6]))
         self.update_status(cursor, 'team_manager', team['team_manager'])
         self.update_status(cursor, 'team_money', team['team_money'])
         self.update_status(cursor, 'team_value', team['team_value'])
         self.update_status(cursor, 'team_points', team['team_points'])
         cursor.execute('DELETE FROM players')
-        cursor.executemany('INSERT INTO players(player_id,name,team,pos,status,sale_value,points) VALUES(?,?,?,?,?,?,?)',
-                           players)
+        cursor.executemany('INSERT INTO players(player_id,name,team,pos,status,buy_tt,buy_value,sale_value,points) '
+                           'VALUES(?,?,?,?,?,?,?,?,?)', players_db)
         self.connection.commit()
 
     def update_status(self, cursor, key, value):
@@ -99,5 +107,5 @@ if __name__ == "__main__":
     database = Database(configuration)
     # database.update_operations()
     # database.get_operations()
+    # database.update_players()
     database.get_players()
-    database.update_players()

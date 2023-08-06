@@ -20,6 +20,8 @@ CREATE TABLE players (
   team TEXT NOT NULL,
   pos INTEGER NOT NULL,
   status TEXT NOT NULL,
+  buy_tt TIMESTAMP NOT NULL,
+  buy_value INTEGER NOT NULL,
   sale_value INTEGER NOT NULL,
   points INTEGER);
 
@@ -32,7 +34,7 @@ INSERT INTO operations (player_id, name, pos, buy_tt, buy_value) VALUES
 ("257", "Gorosabel", "2", "2023-07-28T22:00:00+02:00", 7971035),
 ("300", "Diakhaby", "2", "2023-07-28T22:00:00+02:00", 8571949),
 ("1428", "Babic", "2", "2023-07-28T22:00:00+02:00", 7022860),
-("xxxx", "Copete", "2", "2023-07-28T22:00:00+02:00", 5573120),
+("1482", "Copete", "2", "2023-07-28T22:00:00+02:00", 5573120),
 ("1567", "Raúl Parra", "2", "2023-07-28T22:00:00+02:00", 371347),
 ("296", "Jordán", "3", "2023-07-28T22:00:00+02:00", 5630000),
 ("701", "Barrenetxea", "3", "2023-07-28T22:00:00+02:00", 7843647),

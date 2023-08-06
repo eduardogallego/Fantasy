@@ -24,6 +24,10 @@
     </head>
     <body>
         <script>
+          function percentFormatter(value, row) {
+            return value + '%';
+          }
+
           function positionFormatter(value, row) {
             var position = 'POR';
             if (value === 2) {
@@ -36,8 +40,30 @@
             return '<span class="position pos-' + value + '">' + position + '</span>';
           }
 
-          function percentFormatter(value, row) {
-            return value + '%';
+          function teamFormatter(value, row) {
+            var team = 'ATM';
+            if (value === 'c-a-osasuna') {
+                team = 'OSA';
+            } else if (value === 'rcd-mallorca') {
+                team = 'MAL';
+            } else if (value === 'real-madrid') {
+                team = 'RMA';
+            } else if (value === 'real-sociedad') {
+                team = 'RSO';
+            } else if (value === 'valencia-cf') {
+                team = 'VAL';
+            }
+            return '<span class="team team-' + team + '">' + team + '</span>';
+          }
+
+          function statusFormatter(value, row) {
+            var status = value;
+            if (value === 'ok') {
+                return '';
+            } else if (value === 'doubtful') {
+                status = 'UNK';
+            }
+            return '<span class="status status-' + status + '">' + status + '</span>';
           }
         </script>
         <div class="card" style="margin: 10px">

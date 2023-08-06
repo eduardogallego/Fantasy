@@ -14,10 +14,14 @@
   <thead>
     <tr>
       <th data-sortable="true" data-field="name">Player</th>
-      <th data-sortable="true" data-field="team" class="center">Team</th>
+      <th data-sortable="true" data-field="team" data-formatter="teamFormatter" class="center">Team</th>
       <th data-sortable="true" data-field="pos" data-formatter="positionFormatter" class="center">Pos</th>
-      <th data-sortable="true" data-field="status" class="center">Status</th>
+      <th data-sortable="true" data-field="status" data-formatter="statusFormatter" class="center">Status</th>
+      <th data-sortable="true" data-field="buy_tt" class="right">Buy TT</th>
+      <th data-sortable="true" data-field="buy_value" class="right">Buy Value</th>
       <th data-sortable="true" data-field="sale_value" class="right">Sale Value</th>
+      <th data-sortable="true" data-field="benefit" class="right">Benefit</th>
+      <th data-sortable="true" data-field="percent" data-formatter="percentFormatter" class="right">Percent</th>
       <th data-sortable="true" data-field="points" class="right">Points</th>
     </tr>
   </thead>
