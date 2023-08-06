@@ -41,39 +41,44 @@
           }
 
           function teamFormatter(value, row) {
-            var team = 'ATM';
-            if (value === 'athletic-club') {
-                team = 'ATH';
+            if (value === 'atletico-de-madrid') {
+                value = 'ATM';
+            } else if (value === 'athletic-club') {
+                value = 'ATH';
+            } else if (value === 'cadiz-cf') {
+                value = 'CAD';
             } else if (value === 'c-a-osasuna') {
-                team = 'OSA';
+                value = 'OSA';
             } else if (value === 'd-alaves') {
-                team = 'ALA';
+                value = 'ALA';
             } else if (value === 'granada-cf') {
-                team = 'GRA';
+                value = 'GRA';
             } else if (value === 'girona-fc') {
-                team = 'GIR';
+                value = 'GIR';
             } else if (value === 'rayo-vallecano') {
-                team = 'RAY';
+                value = 'RAY';
             } else if (value === 'rc-celta') {
-                team = 'CEL';
+                value = 'CEL';
             } else if (value === 'rcd-mallorca') {
-                team = 'MLL';
+                value = 'MLL';
+            } else if (value === 'real-betis') {
+                value = 'BET';
             } else if (value === 'real-madrid') {
-                team = 'RMA';
+                value = 'RMA';
             } else if (value === 'real-sociedad') {
-                team = 'RSO';
+                value = 'RSO';
             } else if (value === 'sevilla-fc') {
-                team = 'SEV';
+                value = 'SEV';
             } else if (value === 'valencia-cf') {
-                team = 'VAL';
+                value = 'VAL';
             } else if (value === 'villarreal-cf') {
-                team = 'VAL';
+                value = 'VAL';
             } else if (value === 'ud-almeria') {
-                team = 'ALM';
+                value = 'ALM';
             } else if (value === 'ud-las-palmas') {
-                team = 'LPA';
+                value = 'LPA';
             }
-            return '<span class="team team-' + team + '">' + team + '</span>';
+            return '<span class="team team-' + value + '">' + value + '</span>';
           }
 
           function statusFormatter(value, row) {
@@ -84,6 +89,8 @@
                 status = 'UNK';
             } else if (value === 'injured') {
                 status = 'INJ';
+            } else if (value === 'out_of_league') {
+                status = 'OUT';
             }
             return '<span class="status status-' + status + '">' + status + '</span>';
           }
