@@ -30,6 +30,33 @@ class ApiClient:
             'X-Lang': 'es'
         }
 
+    def get_market(self):
+        response = requests.get(self.config.get("market_url"), headers=self.headers)
+        if response.status_code != 200:
+            self.logger.error('Get market %s - Error: %s' % (response.status_code, response.reason))
+        response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
+        self.logger.info('Get market %s - Ok: %s' % (response.status_code, response_dict))
+        response = []
+        for entry in response_dict:
+            position = entry['playerMaster']['positionId']
+            if position == 5 or ('sellerTeam' in entry and entry['sellerTeam']['manager']['managerName'] == 'Edu'):
+                continue  # manager position or mines
+            player_id = entry['playerMaster']['id']
+            player = entry['playerMaster']['nickname']
+            team = entry['playerMaster']['team']['slug']
+            status = entry['playerMaster']['playerStatus']
+            value = entry['playerMaster']['marketValue']
+            points = entry['playerMaster']['points']
+            avgPoints = entry['playerMaster']['averagePoints']
+            bids = entry['numberOfBids'] if 'numberOfBids' in entry else None
+            myBid = entry['bid']['money'] if 'bid' in entry else None
+            seller = entry['sellerTeam']['manager']['managerName'] if 'sellerTeam' in entry else None
+            market_variation_3d = self.get_market_variation_3d(player_id)
+            # print(player, team, position, status, value, market_variation_3d, points, avgPoints, bids, myBid, seller)
+            response.append((player, team, position, status, value, market_variation_3d,
+                             points, avgPoints, bids, myBid, seller))
+        return response
+
     def get_market_variation_3d(self, player_id):
         response = requests.get(self.config.get("market_value_url") % player_id, headers=self.headers)
         if response.status_code != 200:
@@ -53,7 +80,7 @@ class ApiClient:
         team_money = response_dict['teamMoney']
         team_value = response_dict['teamValue']
         team_points = response_dict['teamPoints']
-        # print(f'{manager} - Cash {team_money}, Value {team_value}, Points {team_points}')
+        # print(manager, team_money, team_value, team_points')
         team_dict = {'team_manager': manager, 'team_money': team_money,
                      'team_value': team_value, 'team_points': team_points}
         players = []
@@ -65,8 +92,9 @@ class ApiClient:
             status = player['playerMaster']['playerStatus']
             team = player['playerMaster']['team']['slug']
             points = player['playerMaster']['points']
-            # print(f'- {name}, {player_id}, {team}, {position}, {status}, {value}, {points}')
-            players.append((player_id, name, team, position, status, value, points))
+            percent_change_3d = self.get_market_variation_3d(player_id)
+            # print(name, player_id, team, position, status, value, percent_change_3d, points')
+            players.append((player_id, name, team, position, status, value, percent_change_3d, points))
         return team_dict, players
 
     def get_operations(self):
@@ -83,7 +111,7 @@ class ApiClient:
             player_id = operation['player']['id']
             player_name = operation['player']['nickname']
             player_position = operation['player']['positionId']
-            # print(f'{type} {player_name} ({player_id}): {player_position}, {value}, {timestamp}')
+            # print((player_id, player_name, player_position, type, value, timestamp))
             response.append({"player_id": player_id, "name": player_name, "pos": player_position,
                              "type": type, "value": value, "timestamp": timestamp})
         return response
@@ -94,4 +122,5 @@ if __name__ == "__main__":
     api_client = ApiClient(configuration)
     # api_client.get_operations()
     # api_client.get_players()
-    api_client.get_market_variation('230')
+    # api_client.get_market_variation('230')
+    api_client.get_market()

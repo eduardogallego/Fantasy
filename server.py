@@ -52,6 +52,18 @@ def root():
     return redirect("/players")
 
 
+@app.route('/market', methods=['GET'])
+@login_required
+def market():
+    return render_template("market.html")
+
+
+@app.route('/market.json', methods=['GET'])
+def market_json():
+    database = Database(config)
+    return database.get_market()
+
+
 @app.route('/operations', methods=['GET'])
 @login_required
 def operations():

@@ -23,6 +23,21 @@ class Database:
         except Error as e:
             self.logger.ERROR("Database Error: " + e)
 
+    def get_market(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT name, team, pos, status, buy_value, percent_change_3d, points, avgPoints, "
+                       "bids, myBid, seller FROM market ORDER BY avgPoints DESC, percent_change_3d DESC")
+        rows = cursor.fetchall()
+        result = []
+        for row in rows:
+            result.append({"name": row[0], "team": row[1], "pos": row[2], "status": row[3],
+                           "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "percent_chg_3d": row[5],
+                           "points": row[6], "avgPoints": row[7], "bids": row[8],
+                           "myBid": '{0:.2f}'.format(round(row[9] / 1000000, 2)) if row[9] is not None else None,
+                           "seller": row[10]})
+        print(json.dumps(result))
+        return json.dumps(result)
+
     def get_operations(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, pos, buy_tt, buy_value, sale_tt, sale_value FROM operations "
@@ -84,6 +99,14 @@ class Database:
             self.update_status(cursor, 'last_operation', latest_operation)
         self.connection.commit()
 
+    def update_market(self):
+        cursor = self.connection.cursor()
+        market = self.api_client.get_market()
+        cursor.execute('DELETE FROM market')
+        cursor.executemany('INSERT INTO market(name,team,pos,status,buy_value,percent_change_3d,points,'
+                           'avgPoints,bids,myBid,seller) VALUES(?,?,?,?,?,?,?,?,?,?,?)', market)
+        self.connection.commit()
+
     def update_players(self):
         cursor = self.connection.cursor()
         team, players = self.api_client.get_players()
@@ -92,9 +115,8 @@ class Database:
             cursor.execute(f"SELECT buy_tt, buy_value FROM operations "
                            f"WHERE player_id = {player[0]} AND sale_tt IS NULL")
             buy_prices = cursor.fetchone()
-            percent_change_3d = self.api_client.get_market_variation_3d(player[0])
             players_db.append((player[0], player[1], player[2], player[3], player[4], buy_prices[0],
-                               buy_prices[1], player[5], percent_change_3d, player[6]))
+                               buy_prices[1], player[5], player[6], player[7]))
         self.update_status(cursor, 'team_manager', team['team_manager'])
         self.update_status(cursor, 'team_money', team['team_money'])
         self.update_status(cursor, 'team_value', team['team_value'])
@@ -111,7 +133,9 @@ class Database:
 if __name__ == "__main__":
     configuration = Config()
     database = Database(configuration)
-    # database.update_operations()
+    database.update_operations()
     # database.get_operations()
     database.update_players()
     # database.get_players()
+    database.update_market()
+    # database.get_market()

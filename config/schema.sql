@@ -1,3 +1,18 @@
+DROP TABLE IF EXISTS market;
+CREATE TABLE market (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  team TEXT NOT NULL,
+  pos INTEGER NOT NULL,
+  status TEXT NOT NULL,
+  buy_value INTEGER NOT NULL,
+  percent_change_3d INTEGER NOT NULL,
+  points INTEGER NOT NULL,
+  avgPoints INTEGER NOT NULL,
+  bids INTEGER,
+  myBid INTEGER,
+  seller TEXT);
+
 DROP TABLE IF EXISTS operations;
 CREATE TABLE operations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,7 +37,7 @@ CREATE TABLE players (
   buy_value INTEGER NOT NULL,
   sale_value INTEGER NOT NULL,
   percent_change_3d INTEGER NOT NULL,
-  points INTEGER);
+  points INTEGER NOT NULL);
 
 DROP TABLE IF EXISTS status;
 CREATE TABLE status (

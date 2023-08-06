@@ -35,15 +35,24 @@
     text-align: center;
     width: 40px;
 }
-.team-ATM {
-    background-color: red;
+.team-ALA, .team-CEL, .team-RSO {
+    background-color: blue;
 }
-.team-MAL, .team-OSA {
+.team-ATH, .team-MLL, .team-OSA {
     background-color: red;
     color: black;
 }
-.team-RSO {
-    background-color: blue;
+.team-ALM, .team-GIR, .team-GRA, .team-RAY, .team-SEV {
+    background-color: white;
+    color: red;
+    border: 1px solid red;
+}
+.team-ATM {
+    background-color: red;
+}
+.team-CAD, .team-LPA, .team-VIL {
+    background-color: yellow;
+    color: blue;
 }
 .team-RMA {
     background-color: purple;
@@ -62,6 +71,9 @@
     height: 20px;
     text-align: center;
     width: 40px;
+}
+.status-INJ {
+    background-color: red;
 }
 .status-UNK {
     background-color: orange;

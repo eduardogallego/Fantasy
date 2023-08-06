@@ -42,16 +42,36 @@
 
           function teamFormatter(value, row) {
             var team = 'ATM';
-            if (value === 'c-a-osasuna') {
+            if (value === 'athletic-club') {
+                team = 'ATH';
+            } else if (value === 'c-a-osasuna') {
                 team = 'OSA';
+            } else if (value === 'd-alaves') {
+                team = 'ALA';
+            } else if (value === 'granada-cf') {
+                team = 'GRA';
+            } else if (value === 'girona-fc') {
+                team = 'GIR';
+            } else if (value === 'rayo-vallecano') {
+                team = 'RAY';
+            } else if (value === 'rc-celta') {
+                team = 'CEL';
             } else if (value === 'rcd-mallorca') {
-                team = 'MAL';
+                team = 'MLL';
             } else if (value === 'real-madrid') {
                 team = 'RMA';
             } else if (value === 'real-sociedad') {
                 team = 'RSO';
+            } else if (value === 'sevilla-fc') {
+                team = 'SEV';
             } else if (value === 'valencia-cf') {
                 team = 'VAL';
+            } else if (value === 'villarreal-cf') {
+                team = 'VAL';
+            } else if (value === 'ud-almeria') {
+                team = 'ALM';
+            } else if (value === 'ud-las-palmas') {
+                team = 'LPA';
             }
             return '<span class="team team-' + team + '">' + team + '</span>';
           }
@@ -62,6 +82,8 @@
                 return '';
             } else if (value === 'doubtful') {
                 status = 'UNK';
+            } else if (value === 'injured') {
+                status = 'INJ';
             }
             return '<span class="status status-' + status + '">' + status + '</span>';
           }
