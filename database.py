@@ -1,31 +1,65 @@
 import logging
 import sqlite3
 
+from apiclient import ApiClient
+from datetime import datetime, timedelta
 from sqlite3 import Error
-from utils import Logger
-
-Logger()
-logger = logging.getLogger('server')
+from utils import Config
 
 
 class Database:
 
-    def __init__(self):
-        db_file = r"database.db"
+    db_file = r"database.db"
+    # timestamp: datetime.now().astimezone().isoformat(), +timezone +Tsyntax, 2023-08-06T02:29:33.213873+02:00
+
+    def __init__(self, config):
+        self.logger = logging.getLogger('database')
+        self.config = config
+        self.api_client = ApiClient(config)
         self.connection = None
         try:
-            self.connection = sqlite3.connect(db_file)
+            self.connection = sqlite3.connect(self.db_file)
         except Error as e:
-            logger.ERROR("Database Error: " + e)
+            self.logger.ERROR("Database Error: " + e)
 
     def get_operations(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, pos, buy_tt, buy_value, sell_tt, sell_value FROM operations")
+        cursor.execute("SELECT name, pos, buy_tt, buy_value, sale_tt, sale_value FROM operations "
+                       "WHERE sale_tt IS NOT NULL ORDER BY sale_tt DESC, buy_tt DESC")
         rows = cursor.fetchall()
         for row in rows:
             print(row)
 
+    def update_operations(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT status_value FROM status WHERE status_key = 'last_operation'")
+        last_operation = cursor.fetchone()[0]
+        sale_operations = []
+        buy_operations = []
+        latest_operation = None
+        for operation in self.api_client.get_operations():
+            if last_operation is None \
+                    or datetime.fromisoformat(operation['timestamp']) > datetime.fromisoformat(last_operation):
+                if operation['type'] == 'sale':
+                    sale_operations.append(operation)
+                else:
+                    buy_operations.append((operation['player_id'], operation['name'], operation['pos'],
+                                           operation['timestamp'], operation['value']))
+                if latest_operation is None or operation['timestamp'] > latest_operation:
+                    latest_operation = operation['timestamp']
+        if buy_operations:
+            cursor.executemany('INSERT INTO operations(player_id,name,pos,buy_tt,buy_value) VALUES(?,?,?,?,?)',
+                               buy_operations)
+        for sale in sale_operations:
+            cursor.execute(f"UPDATE operations SET sale_tt = '{sale['timestamp']}', sale_value = {sale['value']} "
+                           f"WHERE player_id = '{sale['player_id']}' AND sale_tt IS NULL")
+        if latest_operation is not None:
+            cursor.execute(f"UPDATE status SET status_value = '{latest_operation}' where status_key = 'last_operation'")
+        self.connection.commit()
+
 
 if __name__ == "__main__":
-    database = Database()
+    configuration = Config()
+    database = Database(configuration)
+    database.update_operations()
     database.get_operations()

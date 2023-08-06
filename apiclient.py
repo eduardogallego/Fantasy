@@ -53,8 +53,28 @@ class ApiClient:
             print(f'- {player_name}, {player_position}, {player_team}, '
                   f'{player_status}, {player_value}, {player_points}')
 
+    def get_operations(self):
+        response = requests.get(self.config.get("history_url"), headers=self.headers)
+        if response.status_code != 200:
+            self.logger.error('Get players %s - Error: %s' % (response.status_code, response.reason))
+        response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
+        self.logger.info('Get players %s - Ok: %s' % (response.status_code, response_dict))
+        response = []
+        for operation in response_dict:
+            type = operation['operation']
+            value = operation['money']
+            timestamp = operation['date']
+            player_id = operation['player']['id']
+            player_name = operation['player']['nickname']
+            player_position = operation['player']['positionId']
+            # print(f'{type} {player_name} ({player_id}): {player_position}, {value}, {timestamp}')
+            response.append({"player_id": player_id, "name": player_name, "pos": player_position,
+                             "type": type, "value": value, "timestamp": timestamp})
+        return response
+
 
 if __name__ == "__main__":
-    config = Config()
-    web_client = ApiClient(config)
-    web_client.get_players()
+    configuration = Config()
+    api_client = ApiClient(configuration)
+    # api_client.get_players()
+    api_client.get_operations()
