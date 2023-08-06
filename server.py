@@ -49,7 +49,7 @@ def login_action():
 @app.route('/', methods=['GET'])
 @login_required
 def root():
-    return redirect("/index")
+    return redirect("/players")
 
 
 @app.route('/operations', methods=['GET'])

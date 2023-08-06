@@ -1,7 +1,4 @@
-DROP TABLE IF EXISTS status;
 DROP TABLE IF EXISTS operations;
-DROP TABLE IF EXISTS players;
-
 CREATE TABLE operations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   player_id TEXT NOT NULL,
@@ -13,6 +10,7 @@ CREATE TABLE operations (
   sale_value INTEGER,
   mean_value REAL DEFAULT 0);
 
+DROP TABLE IF EXISTS players;
 CREATE TABLE players (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   player_id TEXT NOT NULL,
@@ -23,8 +21,10 @@ CREATE TABLE players (
   buy_tt TIMESTAMP NOT NULL,
   buy_value INTEGER NOT NULL,
   sale_value INTEGER NOT NULL,
+  percent_change_3d INTEGER NOT NULL,
   points INTEGER);
 
+DROP TABLE IF EXISTS status;
 CREATE TABLE status (
   status_key TEXT NOT NULL,
   status_value TEXT);

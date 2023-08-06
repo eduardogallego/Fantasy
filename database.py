@@ -36,11 +36,12 @@ class Database:
                            "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
                            "benefit": '{0:.2f}'.format(round((row[5] - row[3]) / 1000000, 2)),
                            "percent": round((row[5] - row[3]) * 100 / row[3], 0)})
+        print(json.dumps(result))
         return json.dumps(result)
 
     def get_players(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, team, pos, status, buy_tt, buy_value, sale_value, points "
+        cursor.execute("SELECT name, team, pos, status, buy_tt, buy_value, sale_value, percent_change_3d, points "
                        "FROM players ORDER BY pos ASC, sale_value DESC")
         rows = cursor.fetchall()
         result = []
@@ -50,7 +51,11 @@ class Database:
                            "buy_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
                            "sale_value": '{0:.2f}'.format(round(row[6] / 1000000, 2)),
                            "benefit": '{0:.2f}'.format(round((row[6] - row[5]) / 1000000, 2)),
-                           "percent": round((row[6] - row[5]) * 100 / row[5], 0), "points": row[7]})
+                           "percent_ben": round((row[6] - row[5]) * 100 / row[5]),
+                           "change_3d": '{0:.2f}'.format(round(row[7] * row[6] / 100000000, 2)),
+                           "percent_chg_3d": row[7],
+                           "points": row[8]})
+        print(json.dumps(result))
         return json.dumps(result)
 
     def update_operations(self):
@@ -86,16 +91,17 @@ class Database:
         for player in players:
             cursor.execute(f"SELECT buy_tt, buy_value FROM operations "
                            f"WHERE player_id = {player[0]} AND sale_tt IS NULL")
-            row = cursor.fetchone()
-            players_db.append((player[0], player[1], player[2], player[3], player[4],
-                               row[0], row[1], player[5], player[6]))
+            buy_prices = cursor.fetchone()
+            percent_change_3d = self.api_client.get_market_variation_3d(player[0])
+            players_db.append((player[0], player[1], player[2], player[3], player[4], buy_prices[0],
+                               buy_prices[1], player[5], percent_change_3d, player[6]))
         self.update_status(cursor, 'team_manager', team['team_manager'])
         self.update_status(cursor, 'team_money', team['team_money'])
         self.update_status(cursor, 'team_value', team['team_value'])
         self.update_status(cursor, 'team_points', team['team_points'])
         cursor.execute('DELETE FROM players')
-        cursor.executemany('INSERT INTO players(player_id,name,team,pos,status,buy_tt,buy_value,sale_value,points) '
-                           'VALUES(?,?,?,?,?,?,?,?,?)', players_db)
+        cursor.executemany('INSERT INTO players(player_id,name,team,pos,status,buy_tt,buy_value,sale_value,'
+                           'percent_change_3d,points) VALUES(?,?,?,?,?,?,?,?,?,?)', players_db)
         self.connection.commit()
 
     def update_status(self, cursor, key, value):
@@ -107,5 +113,5 @@ if __name__ == "__main__":
     database = Database(configuration)
     # database.update_operations()
     # database.get_operations()
-    # database.update_players()
-    database.get_players()
+    database.update_players()
+    # database.get_players()
