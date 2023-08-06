@@ -1,6 +1,5 @@
 /.idea/
-/config.json
+/config/config.json
 /fantasy.log
-/test.py
 /venv/
 /workingdir/

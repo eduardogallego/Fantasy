@@ -64,6 +64,18 @@ def operations_json():
     return database.get_operations()
 
 
+@app.route('/players', methods=['GET'])
+@login_required
+def players():
+    return render_template("players.html")
+
+
+@app.route('/players.json', methods=['GET'])
+def players_json():
+    database = Database(config)
+    return database.get_players()
+
+
 @app.route('/favicon.ico', methods=['GET'])
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'images'),

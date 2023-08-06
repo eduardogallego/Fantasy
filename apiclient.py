@@ -31,27 +31,29 @@ class ApiClient:
         }
 
     def get_players(self):
-        response = requests.get(config.get("team_url"), headers=self.headers)
+        response = requests.get(self.config.get("team_url"), headers=self.headers)
         if response.status_code != 200:
             self.logger.error('Get players %s - Error: %s' % (response.status_code, response.reason))
         response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
         self.logger.info('Get players %s - Ok: %s' % (response.status_code, response_dict))
-        print('Get players %s - Ok: %s' % (response.status_code, response_dict))
         manager = response_dict['manager']['managerName']
         team_money = response_dict['teamMoney']
         team_value = response_dict['teamValue']
         team_points = response_dict['teamPoints']
-        team_players = response_dict['playersNumber']
-        print(f'{manager} - Cash: {team_money}, Team ({team_players}): {team_value}, Points {team_points}')
+        # print(f'{manager} - Cash {team_money}, Value {team_value}, Points {team_points}')
+        team_dict = {'team_manager': manager, 'team_money': team_money, 'team_value': team_value, 'team_points': team_points}
+        players = []
         for player in response_dict['players']:
-            player_name = player['playerMaster']['nickname']
-            player_position = player['playerMaster']['positionId']
-            player_value = player['buyoutClause']
-            player_status = player['playerMaster']['playerStatus']
-            player_team = player['playerMaster']['team']['slug']
-            player_points = player['playerMaster']['points']
-            print(f'- {player_name}, {player_position}, {player_team}, '
-                  f'{player_status}, {player_value}, {player_points}')
+            player_id = player['playerMaster']['id']
+            name = player['playerMaster']['nickname']
+            position = player['playerMaster']['positionId']
+            value = player['buyoutClause']
+            status = player['playerMaster']['playerStatus']
+            team = player['playerMaster']['team']['slug']
+            points = player['playerMaster']['points']
+            # print(f'- {name}, {player_id}, {team}, {position}, {status}, {value}, {points}')
+            players.append((player_id, name, team, position, status, value, points))
+        return team_dict, players
 
     def get_operations(self):
         response = requests.get(self.config.get("history_url"), headers=self.headers)
@@ -76,5 +78,5 @@ class ApiClient:
 if __name__ == "__main__":
     configuration = Config()
     api_client = ApiClient(configuration)
-    # api_client.get_players()
-    api_client.get_operations()
+    # api_client.get_operations()
+    api_client.get_players()

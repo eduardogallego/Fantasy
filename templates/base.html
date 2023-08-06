@@ -23,6 +23,23 @@
         {% endblock %}
     </head>
     <body>
+        <script>
+          function positionFormatter(value, row) {
+            var position = 'POR';
+            if (value === 2) {
+                position = 'DEF';
+            } else if (value === 3) {
+                position = 'CEN';
+            } else if (value === 4) {
+                position = 'DEL';
+            }
+            return '<span class="position pos-' + value + '">' + position + '</span>';
+          }
+
+          function percentFormatter(value, row) {
+            return value + '%';
+          }
+        </script>
         <div class="card" style="margin: 10px">
             <div class="card-body">
                 {% block card_body %}
