@@ -61,7 +61,6 @@ INSERT INTO operations (player_id, name, pos, buy_tt, buy_value) VALUES
 ("1447", "Stuani", "4", "2023-07-28T22:00:00+02:00", 7036099);
 
 INSERT INTO status (status_key, status_value) VALUES ("last_operation", "2023-07-28T00:00:00+02:00");
-INSERT INTO status (status_key, status_value) VALUES ("last_player", "2023-07-28T00:00:00+02:00");
 INSERT INTO status (status_key, status_value) VALUES ("team_manager", NULL);
 INSERT INTO status (status_key, status_value) VALUES ("team_money", NULL);
 INSERT INTO status (status_key, status_value) VALUES ("team_value", NULL);

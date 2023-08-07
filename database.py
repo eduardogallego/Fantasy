@@ -35,7 +35,7 @@ class Database:
                            "points": row[6], "avgPoints": row[7], "bids": row[8],
                            "myBid": '{0:.2f}'.format(round(row[9] / 1000000, 2)) if row[9] is not None else None,
                            "seller": row[10]})
-        print(json.dumps(result))
+        # print(json.dumps(result))
         return json.dumps(result)
 
     def get_operations(self):
@@ -51,7 +51,7 @@ class Database:
                            "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
                            "benefit": '{0:.2f}'.format(round((row[5] - row[3]) / 1000000, 2)),
                            "percent": round((row[5] - row[3]) * 100 / row[3], 0)})
-        print(json.dumps(result))
+        # print(json.dumps(result))
         return json.dumps(result)
 
     def get_players(self):
@@ -70,8 +70,19 @@ class Database:
                            "change_3d": '{0:.2f}'.format(round(row[7] * row[6] / 100000000, 2)),
                            "percent_chg_3d": row[7],
                            "points": row[8]})
-        print(json.dumps(result))
+        # print(json.dumps(result))
         return json.dumps(result)
+
+    def get_status(self, key):
+        cursor = self.connection.cursor()
+        cursor.execute(f"SELECT status_value FROM status WHERE status_key = '{key}'")
+        return cursor.fetchone()[0]
+
+    def get_team_status(self):
+        money = round(int(self.get_status('team_money')) / 1000000)
+        value = round(int(self.get_status('team_value')) / 1000000)
+        points = self.get_status('team_points')
+        return money, value, points
 
     def update_operations(self):
         cursor = self.connection.cursor()

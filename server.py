@@ -55,7 +55,9 @@ def root():
 @app.route('/market', methods=['GET'])
 @login_required
 def market():
-    return render_template("market.html")
+    database = Database(config)
+    money, value, points = database.get_team_status()
+    return render_template("market.html", points=points, cash=money, team=value)
 
 
 @app.route('/market.json', methods=['GET'])
@@ -67,7 +69,9 @@ def market_json():
 @app.route('/operations', methods=['GET'])
 @login_required
 def operations():
-    return render_template("operations.html")
+    database = Database(config)
+    money, value, points = database.get_team_status()
+    return render_template("operations.html", points=points, cash=money, team=value)
 
 
 @app.route('/operations.json', methods=['GET'])
@@ -79,7 +83,9 @@ def operations_json():
 @app.route('/players', methods=['GET'])
 @login_required
 def players():
-    return render_template("players.html")
+    database = Database(config)
+    money, value, points = database.get_team_status()
+    return render_template("players.html", points=points, cash=money, team=value)
 
 
 @app.route('/players.json', methods=['GET'])

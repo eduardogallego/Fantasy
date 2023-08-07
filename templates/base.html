@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Fantasy</title>
+        <title>Fantasy Edu</title>
         <meta charset="UTF-8">
         <meta name="msapplication-TileColor" content="#da532c">
         <meta name="msapplication-config" content="/images/browserconfig.xml">
@@ -72,7 +72,7 @@
             } else if (value === 'valencia-cf') {
                 value = 'VAL';
             } else if (value === 'villarreal-cf') {
-                value = 'VAL';
+                value = 'VIL';
             } else if (value === 'ud-almeria') {
                 value = 'ALM';
             } else if (value === 'ud-las-palmas') {
@@ -95,6 +95,38 @@
             return '<span class="status status-' + status + '">' + status + '</span>';
           }
         </script>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/players">
+                    <img src="/images/futbol.png" alt="Logo" width="26"
+                         height="26" class="d-inline-block align-text-top">
+                    Fantasy Edu
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/players">Players</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/operations">Operations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/market">Market</a>
+                        </li>
+                    </ul>
+                    <table class="d-flex right">
+                        <tr class="team_details"><td>{{ points }} points</td></tr>
+                        <tr class="team_details"><td>{{ cash }} cash</td></tr>
+                        <tr class="team_details"><td>{{ team }} team</td></tr>
+                    </table>
+                </div>
+            </div>
+        </nav>
         <div class="card" style="margin: 10px">
             <div class="card-body">
                 {% block card_body %}
