@@ -13,19 +13,20 @@ html {
 }
 
 .index {
-    text-align: right;
     padding-right: 8px !important;
+    text-align: right;
     width: 50px;
+}
+.delta {
+    text-align: right;
+    width: 40px;
 }
 .tag {
     text-align: center;
     width: 32px;
 }
 .right {
-    text-align: right;
-}
-.top-right {
-    padding-right: 8px !important;
+    padding-right: 4px !important;
     text-align: right;
 }
 
@@ -86,6 +87,11 @@ html {
     background-color: red;
     border: 1px solid red;
 }
+.team-BAR {
+    background-color: blue;
+    border: 1px solid blue;
+    color: red;
+}
 .team-BET {
     background-color: green;
     border: 1px solid green;
@@ -101,8 +107,9 @@ html {
     color: black;
 }
 .team-RMA {
-    background-color: purple;
+    background-color: white;
     border: 1px solid purple;
+    color: purple;
 }
 .team-VAL {
     background-color: white;
@@ -162,6 +169,10 @@ html {
     background-color: orange;
     border: 1px solid orange;
 }
+.own-NIC {
+    background-color: brown;
+    border: 1px solid brown;
+}
 .own-RAM {
     background-color: purple;
     border: 1px solid purple;
@@ -169,4 +180,54 @@ html {
 .own-SPO {
     background-color: black;
     border: 1px solid black;
+}
+
+.scale-0 {
+    background-color: rgb(128,128,128) !important;
+    color: white !important;
+}
+.scale-1 {
+    background-color: rgb(100,128,100) !important;
+    color: white !important;
+}
+.scale-2 {
+    background-color: rgb(72,128,72) !important;
+    color: white !important;
+}
+.scale-3 {
+    background-color: rgb(44,128,44) !important;
+    color: white !important;
+}
+.scale-4 {
+    background-color: rgb(15,128,15) !important;
+    color: white !important;
+}
+.scale-5 {
+    background-color: rgb(0,141,0) !important;
+    color: white !important;
+}
+.scale-6 {
+    background-color: rgb(0,170,0) !important;
+    color: white !important;
+}
+.scale-7 {
+    background-color: rgb(0,198,0) !important;
+    color: white !important;
+}
+.scale-8 {
+    background-color: rgb(0,227,0) !important;
+    color: white !important;
+}
+.scale-9 {
+    background-color: rgb(0,255,0) !important;
+    color: white !important;
+}
+
+.warning {
+    background-color: orange !important;
+    color: white !important;
+}
+.error {
+    background-color: red !important;
+    color: white !important;
 }

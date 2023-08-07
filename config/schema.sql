@@ -37,6 +37,8 @@ CREATE TABLE players (
   buy_value INTEGER NOT NULL,
   sale_value INTEGER NOT NULL,
   percent_change_3d INTEGER NOT NULL,
+  clause_value INTEGER NOT NULL,
+  clause_tt TIMESTAMP NOT NULL,
   points INTEGER NOT NULL);
 
 DROP TABLE IF EXISTS status;

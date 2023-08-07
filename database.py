@@ -3,7 +3,7 @@ import logging
 import sqlite3
 
 from apiclient import ApiClient
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlite3 import Error
 from utils import Config
 
@@ -29,8 +29,13 @@ class Database:
                        "bids, myBid, seller FROM market ORDER BY avgPoints DESC, percent_change_3d DESC")
         rows = cursor.fetchall()
         result = []
+        value_list = []
         for row in rows:
-            result.append({"name": row[0], "team": row[1], "pos": row[2], "status": row[3],
+            value_list.append(row[4])
+        list.sort(value_list, reverse=True)
+        for row in rows:
+            index = value_list.index(row[4]) + 1
+            result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "percent_chg_3d": row[5],
                            "points": row[6], "avgPoints": row[7], "bids": row[8],
                            "myBid": '{0:.2f}'.format(round(row[9] / 1000000, 2)) if row[9] is not None else None,
@@ -63,8 +68,8 @@ class Database:
 
     def get_players(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, team, pos, status, buy_tt, buy_value, sale_value, percent_change_3d, points "
-                       "FROM players ORDER BY pos ASC, sale_value DESC")
+        cursor.execute("SELECT name, team, pos, status, buy_value, sale_value, clause_value, clause_tt, "
+                       "percent_change_3d, points FROM players ORDER BY pos ASC, sale_value DESC")
         rows = cursor.fetchall()
         result = []
         value_list = []
@@ -73,15 +78,16 @@ class Database:
         list.sort(value_list, reverse=True)
         for row in rows:
             index = value_list.index(row[6]) + 1
+            clause_secs = round((datetime.fromisoformat(row[7]) - datetime.now(timezone.utc)).total_seconds())
             result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
-                           "buy_tt": datetime.fromisoformat(row[4]).strftime('%d-%m-%y'),
-                           "buy_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
-                           "sale_value": '{0:.2f}'.format(round(row[6] / 1000000, 2)),
-                           "benefit": '{0:.2f}'.format(round((row[6] - row[5]) / 1000000, 2)),
-                           "percent_ben": round((row[6] - row[5]) * 100 / row[5]),
-                           "change_3d": '{0:.2f}'.format(round(row[7] * row[6] / 100000000, 2)),
-                           "percent_chg_3d": row[7],
-                           "points": row[8]})
+                           "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
+                           "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
+                           "clause_value": '{0:.2f}'.format(round(row[6] / 1000000, 2)), "clause_secs": clause_secs,
+                           "benefit": '{0:.2f}'.format(round((row[5] - row[4]) / 1000000, 2)),
+                           "percent_ben": round((row[5] - row[4]) * 100 / row[4]),
+                           "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
+                           "percent_chg_3d": row[8],
+                           "points": row[9]})
         # print(json.dumps(result))
         return json.dumps(result)
 
@@ -139,14 +145,15 @@ class Database:
                            f"WHERE player_id = {player[0]} AND sale_tt IS NULL")
             buy_prices = cursor.fetchone()
             players_db.append((player[0], player[1], player[2], player[3], player[4], buy_prices[0],
-                               buy_prices[1], player[5], player[6], player[7]))
+                               buy_prices[1], player[5], player[6], player[7], player[8], player[9]))
         self.update_status(cursor, 'team_manager', team['team_manager'])
         self.update_status(cursor, 'team_money', team['team_money'])
         self.update_status(cursor, 'team_value', team['team_value'])
         self.update_status(cursor, 'team_points', team['team_points'])
         cursor.execute('DELETE FROM players')
         cursor.executemany('INSERT INTO players(player_id,name,team,pos,status,buy_tt,buy_value,sale_value,'
-                           'percent_change_3d,points) VALUES(?,?,?,?,?,?,?,?,?,?)', players_db)
+                           'percent_change_3d,clause_value,clause_tt,points) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
+                           players_db)
         self.connection.commit()
 
     def update_status(self, cursor, key, value):

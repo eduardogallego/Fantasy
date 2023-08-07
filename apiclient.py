@@ -16,7 +16,7 @@ class ApiClient:
             'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8,gl;q=0.7',
             'Access-Control-Allow-Credentials': 'true',
             'Access-Control-Allow-Origin': '*',
-            'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IkNBdXdPcWRMN2YyXzlhTVhZX3ZkbEcyVENXbVV4aklXV1MwNVB4WHljcUkiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJOb3Qgc3VwcG9ydGVkIGN1cnJlbnRseS4gVXNlIG9pZCBjbGFpbS4iLCJleHRlbnNpb25fVXNlclByb2ZpbGVJZCI6IjYzNjFlM2M2LTU3OTUtNGNmNC05MzYzLTc3MDIzNDU1YjI1OSIsIm9pZCI6IjYzNjFlM2M2LTU3OTUtNGNmNC05MzYzLTc3MDIzNDU1YjI1OSIsImV4dGVuc2lvbl9FbWFpbFZlcmlmaWVkIjp0cnVlLCJhenAiOiJmZWM5ZTNmZC04Zjg4LTQ1YWItOGNiZC1iNzBiOWQ2NWRkZTAiLCJ2ZXIiOiIxLjAiLCJpYXQiOjE2OTEzMzY0NzAsImF1ZCI6ImZlYzllM2ZkLThmODgtNDVhYi04Y2JkLWI3MGI5ZDY1ZGRlMCIsImV4cCI6MTY5MTQyMjg3MCwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5sYWxpZ2EuZXMvMzM1MzE2ZWItZjYwNi00MzYxLWJiODYtMzVhN2VkY2RjZWMxL3YyLjAvIiwibmJmIjoxNjkxMzM2NDcwfQ.PwoPn4G-TTDPI98XdJe_io4FnOcuwDkYzxzQoNPT0TtXIlELN6DSRfIeuezcNF0eqnk97X3dga8ZPbaqFc-aCyvwKhRSjCC2pAw5xugt_UwkBXOtNPQsVm9ihHTNySrNXj7LaXs1vD0SXQf0LBKDHPNYWmM2hljJTA_XcGQCcuEldHsqiYfO-4JK5XW7sKK-2zRNySWS0mYKIMbvkLPvRZj7FO6xzejabH3VsfsCDTfhZc5G5Mc8qgEx9ORtFulqif2sTlcOObJf8TI0cMEObNEuJff8P-n8U7fXCHHUiAQeAzuUyhwrOk-yHYRI03YRC_LuHNtppp6MpCgnOh6R9Q',
+            'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IkNBdXdPcWRMN2YyXzlhTVhZX3ZkbEcyVENXbVV4aklXV1MwNVB4WHljcUkiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJOb3Qgc3VwcG9ydGVkIGN1cnJlbnRseS4gVXNlIG9pZCBjbGFpbS4iLCJleHRlbnNpb25fVXNlclByb2ZpbGVJZCI6IjYzNjFlM2M2LTU3OTUtNGNmNC05MzYzLTc3MDIzNDU1YjI1OSIsIm9pZCI6IjYzNjFlM2M2LTU3OTUtNGNmNC05MzYzLTc3MDIzNDU1YjI1OSIsImV4dGVuc2lvbl9FbWFpbFZlcmlmaWVkIjp0cnVlLCJhenAiOiJmZWM5ZTNmZC04Zjg4LTQ1YWItOGNiZC1iNzBiOWQ2NWRkZTAiLCJ2ZXIiOiIxLjAiLCJpYXQiOjE2OTE0Mzc0NjIsImF1ZCI6ImZlYzllM2ZkLThmODgtNDVhYi04Y2JkLWI3MGI5ZDY1ZGRlMCIsImV4cCI6MTY5MTUyMzg2MiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5sYWxpZ2EuZXMvMzM1MzE2ZWItZjYwNi00MzYxLWJiODYtMzVhN2VkY2RjZWMxL3YyLjAvIiwibmJmIjoxNjkxNDM3NDYyfQ.QMZ6l_7OEYYczOtgbEjUnA1wYAYt7pqhON_cZxUkPZrg-v8lVoBn3Lk6vT8Vm-c6QN1hfg5DAKRxxgKWV65-phbfGsKLOJmGSSYwxDygwB7336wx1QQyQEMMMMzdAzGYlqMWABZ4ZTzmxM7bLHy4tgZTX849349cUUTsR-JYqK1SosSpmbgz_OiHvPZhFrNxa4r21OlGd6vvuYld8VMGC2IEuXbmCFM1YO-yVNTNuAfmX6F3L1Oo-VJiA8TJ4ZKNDv7GhNOa7DGvRLHI2oFQmgDkw7kKAzeIY29kwoBnMFQMGdTXXxPN2oDSmB-rC-MTT3skqHU4Z1dWn8Af2RJpUw',
             'Origin': 'https://fantasy.laliga.com',
             'Referer': 'https://fantasy.laliga.com/',
             'Sec-Ch-Ua': '"Not/A)Brand";v="99", "Google Chrome";v="115", "Chromium";v="115"',
@@ -92,9 +92,12 @@ class ApiClient:
             status = player['playerMaster']['playerStatus']
             team = player['playerMaster']['team']['slug']
             points = player['playerMaster']['points']
+            clause = player['buyoutClause']
+            clause_tt = player['buyoutClauseLockedEndTime']
             percent_change_3d = self.get_market_variation_3d(player_id)
-            # print(name, player_id, team, position, status, value, percent_change_3d, points')
-            players.append((player_id, name, team, position, status, value, percent_change_3d, points))
+            # print(name, player_id, team, position, status, value, percent_change_3d, clause, clause_tt, points)
+            players.append((player_id, name, team, position, status, value,
+                            percent_change_3d, clause, clause_tt, points))
         return team_dict, players
 
     def get_operations(self):
@@ -121,6 +124,6 @@ if __name__ == "__main__":
     configuration = Config()
     api_client = ApiClient(configuration)
     # api_client.get_operations()
-    # api_client.get_players()
+    api_client.get_players()
     # api_client.get_market_variation('230')
     # api_client.get_market()

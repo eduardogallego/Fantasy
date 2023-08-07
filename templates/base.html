@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Fantasy Edu</title>
+        <title>Fantasy</title>
         <meta charset="UTF-8">
         <meta name="msapplication-TileColor" content="#da532c">
         <meta name="msapplication-config" content="/images/browserconfig.xml">
@@ -24,161 +24,200 @@
     </head>
     <body>
         <script>
-          function percentFormatter(value, row) {
-            return value + '%';
-          }
-
-          function positionFormatter(value, row) {
-            var position = 'POR';
-            if (value === 2) {
-                position = 'DEF';
-            } else if (value === 3) {
-                position = 'CEN';
-            } else if (value === 4) {
-                position = 'DEL';
+            function percentFormatter(value, row) {
+                return value + '%';
             }
-            return '<span class="position pos-' + value + '">' + position + '</span>';
-          }
 
-          function teamFormatter(value, row) {
-            if (value === 'atletico-de-madrid') {
-                value = 'ATM';
-            } else if (value === 'athletic-club') {
-                value = 'ATH';
-            } else if (value === 'cadiz-cf') {
-                value = 'CAD';
-            } else if (value === 'c-a-osasuna') {
-                value = 'OSA';
-            } else if (value === 'd-alaves') {
-                value = 'ALA';
-            } else if (value === 'granada-cf') {
-                value = 'GRA';
-            } else if (value === 'girona-fc') {
-                value = 'GIR';
-            } else if (value === 'rayo-vallecano') {
-                value = 'RAY';
-            } else if (value === 'rc-celta') {
-                value = 'CEL';
-            } else if (value === 'rcd-mallorca') {
-                value = 'MLL';
-            } else if (value === 'real-betis') {
-                value = 'BET';
-            } else if (value === 'real-madrid') {
-                value = 'RMA';
-            } else if (value === 'real-sociedad') {
-                value = 'RSO';
-            } else if (value === 'sevilla-fc') {
-                value = 'SEV';
-            } else if (value === 'valencia-cf') {
-                value = 'VAL';
-            } else if (value === 'villarreal-cf') {
-                value = 'VIL';
-            } else if (value === 'ud-almeria') {
-                value = 'ALM';
-            } else if (value === 'ud-las-palmas') {
-                value = 'LPA';
+            function positionFormatter(value, row) {
+                var position = 'POR';
+                if (value === 2) {
+                    position = 'DEF';
+                } else if (value === 3) {
+                    position = 'CEN';
+                } else if (value === 4) {
+                    position = 'DEL';
+                }
+                return '<span class="position pos-' + value + '">' + position + '</span>';
             }
-            return '<span class="team team-' + value + '">' + value + '</span>';
-          }
 
-          function ownerFormatter(value, row) {
-            if (value === null) {
-                return '';
+            function teamFormatter(value, row) {
+                if (value === 'atletico-de-madrid') {
+                    value = 'ATM';
+                } else if (value === 'athletic-club') {
+                    value = 'ATH';
+                } else if (value === 'cadiz-cf') {
+                    value = 'CAD';
+                } else if (value === 'c-a-osasuna') {
+                    value = 'OSA';
+                } else if (value === 'd-alaves') {
+                    value = 'ALA';
+                } else if (value === 'fc-barcelona') {
+                    value = 'BAR';
+                } else if (value === 'getafe-cf') {
+                    value = 'GET';
+                } else if (value === 'granada-cf') {
+                    value = 'GRA';
+                } else if (value === 'girona-fc') {
+                    value = 'GIR';
+                } else if (value === 'rayo-vallecano') {
+                    value = 'RAY';
+                } else if (value === 'rc-celta') {
+                    value = 'CEL';
+                } else if (value === 'rcd-mallorca') {
+                    value = 'MLL';
+                } else if (value === 'real-betis') {
+                    value = 'BET';
+                } else if (value === 'real-madrid') {
+                    value = 'RMA';
+                } else if (value === 'real-sociedad') {
+                    value = 'RSO';
+                } else if (value === 'sevilla-fc') {
+                    value = 'SEV';
+                } else if (value === 'valencia-cf') {
+                    value = 'VAL';
+                } else if (value === 'villarreal-cf') {
+                    value = 'VIL';
+                } else if (value === 'ud-almeria') {
+                    value = 'ALM';
+                } else if (value === 'ud-las-palmas') {
+                    value = 'LPA';
+                }
+                return '<span class="team team-' + value + '">' + value + '</span>';
             }
-            if (value === 'Jesus_Ciudad') {
-                value = 'JES';
-            } else if (value === 'Edu') {
-                value = 'EDU';
-            } else if (value === 'liebana_team') {
-                value = 'LIE';
-            } else if (value === 'Cocolan FC') {
-                value = 'COC';
+
+            function ownerFormatter(value, row) {
+                if (value === null) {
+                    return '';
+                }
+                if (value === 'Jesus_Ciudad') {
+                    value = 'JES';
+                } else if (value === 'Edu') {
+                    value = 'EDU';
+                } else if (value === 'liebana_team') {
+                    value = 'LIE';
+                } else if (value === 'Nicojeda') {
+                    value = 'NIC';
+                } else if (value === 'Cocolan FC') {
+                    value = 'COC';
+                }
+                return '<span class="owner own-' + value + '">' + value + '</span>';
             }
-            return '<span class="owner own-' + value + '">' + value + '</span>';
-          }
 
-          function statusFormatter(value, row) {
-            var status = value;
-            if (value === 'ok') {
-                return '';
-            } else if (value === 'doubtful') {
-                status = 'UNK';
-            } else if (value === 'injured') {
-                status = 'INJ';
-            } else if (value === 'out_of_league') {
-                status = 'OUT';
-            } else if (value === 'suspended') {
-                status = 'SUS';
+            function statusFormatter(value, row) {
+                var status = value;
+                if (value === 'ok') {
+                    return '';
+                } else if (value === 'doubtful') {
+                    status = 'UNK';
+                } else if (value === 'injured') {
+                    status = 'INJ';
+                } else if (value === 'out_of_league') {
+                    status = 'OUT';
+                } else if (value === 'suspended') {
+                    status = 'SUS';
+                }
+                return '<span class="status status-' + status + '">' + status + '</span>';
             }
-            return '<span class="status status-' + status + '">' + status + '</span>';
-          }
 
-          function footItemCountFormatter(data) {
-            return data.length;
-          }
+            function deltaSecsFormatter(value, row) {
+                if (value > 86400) {
+                    return (value / 86400).toFixed(0) + 'd'
+                } else if (value > 3600) {
+                    return (value / 3600).toFixed(0) + 'h'
+                } else if (value > 60) {
+                    return (value / 60).toFixed(0) + 'm'
+                } else {
+                    return value + 's';
+                }
+            }
 
-          function footBuyValueFormatter(data) {
-            var total = 0;
-            data.forEach(function(data) {
-                total = total + parseFloat(data.buy_value);
-            });
-            return total.toFixed(0);
-          }
+            function footItemCountFormatter(data) {
+                return data.length;
+            }
 
-          function footSaleValueFormatter(data) {
-            var total = 0;
-            data.forEach(function(data) {
-                total = total + parseFloat(data.sale_value);
-            });
-            return total.toFixed(0);
-          }
+            function footBuyValueFormatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    total = total + parseFloat(data.buy_value);
+                });
+                return total.toFixed(0);
+            }
 
-          function footBenefitValueFormatter(data) {
-            var total = 0;
-            data.forEach(function(data) {
-                total = total + parseFloat(data.benefit);
-            });
-            return total.toFixed(0);
-          }
+            function footSaleValueFormatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    total = total + parseFloat(data.sale_value);
+                });
+                return total.toFixed(0);
+            }
 
-          function footPercBenefitFormatter(data) {
-            var total_buy = 0;
-            data.forEach(function(data) {
-                total_buy = total_buy + parseFloat(data.buy_value);
-            });
-            var total_sale = 0;
-            data.forEach(function(data) {
-                total_sale = total_sale + parseFloat(data.sale_value);
-            });
-            return ((total_sale - total_buy) * 100 / total_buy).toFixed(0) + '%';
-          }
+            function footBenefitValueFormatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    total = total + parseFloat(data.benefit);
+                });
+                return total.toFixed(0);
+            }
 
-          function footChange3dFormatter(data) {
-            var total = 0;
-            data.forEach(function(data) {
-                total = total + parseFloat(data.change_3d);
-            });
-            return total.toFixed(1);
-          }
+            function footPercBenefitFormatter(data) {
+                var total_buy = 0;
+                data.forEach(function(data) {
+                    total_buy = total_buy + parseFloat(data.buy_value);
+                });
+                var total_sale = 0;
+                data.forEach(function(data) {
+                    total_sale = total_sale + parseFloat(data.sale_value);
+                });
+                return ((total_sale - total_buy) * 100 / total_buy).toFixed(0) + '%';
+            }
 
-          function footPerc3dFormatter(data) {
-            var total_sale = 0;
-            data.forEach(function(data) {
-                total_sale = total_sale + parseFloat(data.sale_value);
-            });
-            var total_3d = 0;
-            data.forEach(function(data) {
-                total_3d = total_3d + parseFloat(data.change_3d);
-            });
-            return (total_3d * 100 / total_sale).toFixed(0) + '%';
-          }
+            function footChange3dFormatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    total = total + parseFloat(data.change_3d);
+                });
+                return total.toFixed(1);
+            }
+
+            function footPerc3dFormatter(data) {
+                var total_sale = 0;
+                data.forEach(function(data) {
+                    total_sale = total_sale + parseFloat(data.sale_value);
+                });
+                var total_3d = 0;
+                data.forEach(function(data) {
+                    total_3d = total_3d + parseFloat(data.change_3d);
+                });
+                return (total_3d * 100 / total_sale).toFixed(0) + '%';
+            }
+
+            function cellStyleValue(value, row, index) {
+                var scale = Math.min(Math.floor(value / 10), 9);
+                return {
+                    classes: 'right scale-' + scale
+                }
+            }
+
+            function cellStyleWarnings(value, row, index) {
+                extra = ''
+                if (value !== null) {
+                    if (value === 1) {
+                        extra = ' warning';
+                    } else if (value > 1) {
+                        extra = ' error';
+                    }
+                }
+                return {
+                    classes: 'right' + extra
+                }
+            }
         </script>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
                 <a class="navbar-brand" href="/players">
                     <img src="/images/futbol.png" alt="Logo" width="26"
                          height="26" class="d-inline-block align-text-top">
-                    Fantasy Edu
+                    Fantasy
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
