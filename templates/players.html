@@ -6,21 +6,29 @@
 
 {% block card_body %}
 <script src=”web/javascript.js”></script>
-<table data-toggle="table" data-url="players.json" class="table-borderless">
+<table data-toggle="table" data-url="players.json" data-show-footer="true" class="table-borderless">
   <thead>
     <tr>
-      <th data-sortable="true" data-field="name">Player</th>
-      <th data-field="pos" data-formatter="positionFormatter" class="tag"></th>
-      <th data-field="team" data-formatter="teamFormatter" class="tag"></th>
-      <th data-field="status" data-formatter="statusFormatter" class="tag"></th>
-      <th data-sortable="true" data-field="buy_tt" class="right">Buy</th>
-      <th data-sortable="true" data-field="buy_value" class="right">Val</th>
-      <th data-sortable="true" data-field="sale_value" class="right">Sale</th>
-      <th data-sortable="true" data-field="benefit" class="right">B</th>
-      <th data-sortable="true" data-field="percent_ben" data-formatter="percentFormatter" class="right">%</th>
-      <th data-sortable="true" data-field="change_3d" class="right">3d</th>
-      <th data-sortable="true" data-field="percent_chg_3d" data-formatter="percentFormatter" class="right">%</th>
-      <th data-sortable="true" data-field="points" class="right">Pts</th>
+      <th class="index" data-sortable="true" data-field="index">#</th>
+      <th data-field="name" data-sortable="true">Player</th>
+      <th class="tag" data-field="pos" data-footer-formatter="footItemCountFormatter"
+          data-formatter="positionFormatter"></th>
+      <th class="tag" data-field="team" data-formatter="teamFormatter"></th>
+      <th class="tag" data-field="status" data-formatter="statusFormatter"></th>
+      <th class="right" data-field="buy_tt" data-sortable="true">Buy</th>
+      <th class="right" data-field="buy_value" data-footer-formatter="footBuyValueFormatter"
+          data-sortable="true">Val</th>
+      <th class="right" data-field="sale_value" data-footer-formatter="footSaleValueFormatter"
+          data-sortable="true">Sale</th>
+      <th class="right" data-field="benefit" data-footer-formatter="footBenefitValueFormatter"
+          data-sortable="true">B</th>
+      <th class="right" data-field="percent_ben" data-footer-formatter="footPercBenefitFormatter"
+          data-formatter="percentFormatter" data-sortable="true">%</th>
+      <th class="right" data-field="change_3d" data-footer-formatter="footChange3dFormatter"
+          data-sortable="true">3d</th>
+      <th class="right" data-field="percent_chg_3d" data-footer-formatter="footPerc3dFormatter"
+          data-formatter="percentFormatter" data-sortable="true">%</th>
+      <th class="top-right" data-field="points" data-sortable="true">Pts</th>
     </tr>
   </thead>
 </table>

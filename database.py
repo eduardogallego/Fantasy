@@ -44,12 +44,19 @@ class Database:
                        "WHERE sale_tt IS NOT NULL ORDER BY sale_tt DESC, buy_tt DESC")
         rows = cursor.fetchall()
         result = []
+        benefit_list = []
         for row in rows:
-            result.append({"name": row[0], "pos": row[1], "buy_tt": datetime.fromisoformat(row[2]).strftime('%d-%m-%y'),
+            benefit_list.append(row[5] - row[3])
+        list.sort(benefit_list, reverse=True)
+        for row in rows:
+            benefit = row[5] - row[3]
+            index = benefit_list.index(benefit) + 1
+            result.append({"index": index, "name": row[0], "pos": row[1],
+                           "buy_tt": datetime.fromisoformat(row[2]).strftime('%d-%m-%y'),
                            "buy_value": '{0:.2f}'.format(round(row[3] / 1000000, 2)),
                            "sale_tt": datetime.fromisoformat(row[4]).strftime('%d-%m-%y'),
                            "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
-                           "benefit": '{0:.2f}'.format(round((row[5] - row[3]) / 1000000, 2)),
+                           "benefit": '{0:.2f}'.format(round(benefit / 1000000, 2)),
                            "percent": round((row[5] - row[3]) * 100 / row[3], 0)})
         # print(json.dumps(result))
         return json.dumps(result)
@@ -60,8 +67,13 @@ class Database:
                        "FROM players ORDER BY pos ASC, sale_value DESC")
         rows = cursor.fetchall()
         result = []
+        value_list = []
         for row in rows:
-            result.append({"name": row[0], "team": row[1], "pos": row[2], "status": row[3],
+            value_list.append(row[6])
+        list.sort(value_list, reverse=True)
+        for row in rows:
+            index = value_list.index(row[6]) + 1
+            result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "buy_tt": datetime.fromisoformat(row[4]).strftime('%d-%m-%y'),
                            "buy_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
                            "sale_value": '{0:.2f}'.format(round(row[6] / 1000000, 2)),
