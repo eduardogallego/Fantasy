@@ -6,17 +6,17 @@
 
 {% block card_body %}
 <script src=”web/javascript.js”></script>
-<table data-toggle="table" data-url="operations.json" data-pagination="true" data-search="true" data-page-size="25">
+<table data-toggle="table" data-url="operations.json" data-search="true" class="table-borderless">
   <thead>
     <tr>
       <th data-sortable="true" data-field="name">Player</th>
-      <th data-sortable="true" data-field="pos" data-formatter="positionFormatter" class="center">Pos</th>
-      <th data-sortable="true" data-field="buy_tt" class="right">Buy TT</th>
-      <th data-sortable="true" data-field="buy_value" class="right">Buy Value</th>
-      <th data-sortable="true" data-field="sale_tt" class="right">Sale TT</th>
-      <th data-sortable="true" data-field="sale_value" class="right">Sale Value</th>
-      <th data-sortable="true" data-field="benefit" class="right">Benefit</th>
-      <th data-sortable="true" data-field="percent" data-formatter="percentFormatter" class="right">Percent</th>
+      <th data-field="pos" data-formatter="positionFormatter" class="tag"></th>
+      <th data-sortable="true" data-field="buy_tt" class="right">Buy</th>
+      <th data-sortable="true" data-field="buy_value" class="right">Val</th>
+      <th data-sortable="true" data-field="sale_tt" class="right">Sale</th>
+      <th data-sortable="true" data-field="sale_value" class="right">Val</th>
+      <th data-sortable="true" data-field="benefit" class="right">B</th>
+      <th data-sortable="true" data-field="percent" data-formatter="percentFormatter" class="right">%</th>
     </tr>
   </thead>
 </table>

@@ -1,12 +1,27 @@
-.center {
+html {
+  font-size: 14px;
+}
+
+.table-borderless > tbody > tr > td,
+.table-borderless > tbody > tr > th,
+.table-borderless > tfoot > tr > td,
+.table-borderless > tfoot > tr > th,
+.table-borderless > thead > tr > td,
+.table-borderless > thead > tr > th {
+    border: none;
+    padding: 0;
+}
+
+.tag {
     text-align: center;
+    width: 38px;
 }
 .right {
     text-align: right;
 }
 
 .team_details {
-    font-size: 0.7em;
+    font-size: 0.8em;
     line-height: 1;
 }
 
@@ -16,19 +31,23 @@
     font-size: 0.8em;
     height: 20px;
     text-align: center;
-    width: 40px;
+    width: 36px;
 }
 .pos-1 {
     background-color: red;
+    border: 1px solid red;
 }
 .pos-2 {
     background-color: purple;
+    border: 1px solid purple;
 }
 .pos-3 {
     background-color: blue;
+    border: 1px solid blue;
 }
 .pos-4 {
     background-color: orange;
+    border: 1px solid orange;
 }
 
 .team {
@@ -38,37 +57,43 @@
     font-size: 0.8em;
     height: 20px;
     text-align: center;
-    width: 40px;
+    width: 36px;
 }
 .team-ALA, .team-CEL, .team-RSO {
     background-color: blue;
+    border: 1px solid blue;
 }
 .team-ATH, .team-MLL, .team-OSA {
     background-color: red;
+    border: 1px solid red;
     color: black;
 }
 .team-ALM, .team-GIR, .team-GRA, .team-RAY, .team-SEV {
     background-color: white;
-    color: red;
     border: 1px solid red;
+    color: red;
 }
 .team-ATM {
     background-color: red;
+    border: 1px solid red;
 }
 .team-BET {
     background-color: green;
+    border: 1px solid green;
 }
 .team-CAD, .team-LPA, .team-VIL {
     background-color: yellow;
+    border: 1px solid yellow;
     color: blue;
 }
 .team-RMA {
     background-color: purple;
+    border: 1px solid purple;
 }
 .team-VAL {
     background-color: white;
-    color: black;
     border: 1px solid grey;
+    color: black;
 }
 
 .status {
@@ -78,14 +103,55 @@
     font-size: 0.8em;
     height: 20px;
     text-align: center;
-    width: 40px;
+    width: 36px;
 }
 .status-INJ {
     background-color: red;
+    border: 1px solid red;
 }
 .status-OUT {
     background-color: black;
+    border: 1px solid black;
+}
+.status-SUS {
+    background-color: black;
+    border: 1px solid black;
 }
 .status-UNK {
     background-color: orange;
+    border: 1px solid orange;
+}
+
+.owner {
+    background-color: grey;
+    color: white;
+    display: inline-block;
+    font-size: 0.8em;
+    height: 20px;
+    text-align: center;
+    width: 36px;
+}
+.own-COC {
+    background-color: green;
+    border: 1px solid green;
+}
+.own-EDU {
+    background-color: red;
+    border: 1px solid red;
+}
+.own-LIE {
+    background-color: blue;
+    border: 1px solid blue;
+}
+.own-JES {
+    background-color: orange;
+    border: 1px solid orange;
+}
+.own-RAM {
+    background-color: purple;
+    border: 1px solid purple;
+}
+.own-SPO {
+    background-color: black;
+    border: 1px solid black;
 }

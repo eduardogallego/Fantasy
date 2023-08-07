@@ -39,7 +39,7 @@ def login_action():
     if user.get_user_name() == form_user and user.login(form_password) \
             and login_user(user=user, remember=True, duration=timedelta(days=30)):
         logger.info("User %s authenticated" % form_user)
-        return redirect("/index")
+        return redirect("/players")
     else:
         user.logout()
         logger.warning("Authentication error %s %s" % (form_user, form_password))
@@ -57,7 +57,7 @@ def root():
 def market():
     database = Database(config)
     money, value, points = database.get_team_status()
-    return render_template("market.html", points=points, cash=money, team=value)
+    return render_template("market.html", points=points, cash=money, team=value, total=(money + value))
 
 
 @app.route('/market.json', methods=['GET'])
@@ -71,7 +71,7 @@ def market_json():
 def operations():
     database = Database(config)
     money, value, points = database.get_team_status()
-    return render_template("operations.html", points=points, cash=money, team=value)
+    return render_template("operations.html", points=points, cash=money, team=value, total=(money + value))
 
 
 @app.route('/operations.json', methods=['GET'])
@@ -85,7 +85,7 @@ def operations_json():
 def players():
     database = Database(config)
     money, value, points = database.get_team_status()
-    return render_template("players.html", points=points, cash=money, team=value)
+    return render_template("players.html", points=points, cash=money, team=value, total=(money + value))
 
 
 @app.route('/players.json', methods=['GET'])

@@ -6,20 +6,20 @@
 
 {% block card_body %}
 <script src=”web/javascript.js”></script>
-<table data-toggle="table" data-url="market.json">
+<table data-toggle="table" data-url="market.json" class="table-borderless">
   <thead>
     <tr>
       <th data-sortable="true" data-field="name">Player</th>
-      <th data-sortable="true" data-field="team" data-formatter="teamFormatter" class="center">Team</th>
-      <th data-sortable="true" data-field="pos" data-formatter="positionFormatter" class="center">Pos</th>
-      <th data-sortable="true" data-field="status" data-formatter="statusFormatter" class="center">Stat</th>
-      <th data-sortable="true" data-field="buy_value" class="right">Value</th>
-      <th data-sortable="true" data-field="percent_chg_3d" data-formatter="percentFormatter" class="right">Perc</th>
+      <th data-field="pos" data-formatter="positionFormatter" class="tag"></th>
+      <th data-field="team" data-formatter="teamFormatter" class="tag"></th>
+      <th data-field="status" data-formatter="statusFormatter" class="tag"></th>
+      <th data-sortable="true" data-field="buy_value" class="right">Val</th>
+      <th data-sortable="true" data-field="percent_chg_3d" data-formatter="percentFormatter" class="right">%</th>
       <th data-sortable="true" data-field="points" class="right">Pts</th>
       <th data-sortable="true" data-field="avgPoints" class="right">Avg</th>
-      <th data-sortable="true" data-field="bids" class="right">Bids</th>
+      <th data-sortable="true" data-field="bids" class="right">Bs</th>
       <th data-sortable="true" data-field="myBid" class="right">MyBid</th>
-      <th data-sortable="true" data-field="seller" class="right">Seller</th>
+      <th data-sortable="true" data-field="seller" data-formatter="ownerFormatter" class="tag">Own</th>
     </tr>
   </thead>
 </table>

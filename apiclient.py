@@ -123,4 +123,4 @@ if __name__ == "__main__":
     # api_client.get_operations()
     # api_client.get_players()
     # api_client.get_market_variation('230')
-    api_client.get_market()
+    # api_client.get_market()

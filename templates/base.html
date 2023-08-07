@@ -81,6 +81,22 @@
             return '<span class="team team-' + value + '">' + value + '</span>';
           }
 
+          function ownerFormatter(value, row) {
+            if (value === null) {
+                return '';
+            }
+            if (value === 'Jesus_Ciudad') {
+                value = 'JES';
+            } else if (value === 'Edu') {
+                value = 'EDU';
+            } else if (value === 'liebana_team') {
+                value = 'LIE';
+            } else if (value === 'Cocolan FC') {
+                value = 'COC';
+            }
+            return '<span class="owner own-' + value + '">' + value + '</span>';
+          }
+
           function statusFormatter(value, row) {
             var status = value;
             if (value === 'ok') {
@@ -91,6 +107,8 @@
                 status = 'INJ';
             } else if (value === 'out_of_league') {
                 status = 'OUT';
+            } else if (value === 'suspended') {
+                status = 'SUS';
             }
             return '<span class="status status-' + status + '">' + status + '</span>';
           }
@@ -121,18 +139,13 @@
                     </ul>
                     <table class="d-flex right">
                         <tr class="team_details"><td>{{ points }} points</td></tr>
-                        <tr class="team_details"><td>{{ cash }} cash</td></tr>
-                        <tr class="team_details"><td>{{ team }} team</td></tr>
+                        <tr class="team_details"><td>{{ cash }} cash, {{ team }} team, {{ total }} total</td></tr>
                     </table>
                 </div>
             </div>
         </nav>
-        <div class="card" style="margin: 10px">
-            <div class="card-body">
-                {% block card_body %}
-                {% endblock %}
-            </div>
-        </div>
+        {% block card_body %}
+        {% endblock %}
         <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
                 integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
