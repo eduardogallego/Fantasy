@@ -28,6 +28,19 @@ CREATE TABLE operations (
 DROP TABLE IF EXISTS players;
 CREATE TABLE players (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  team TEXT NOT NULL,
+  pos INTEGER NOT NULL,
+  status TEXT NOT NULL,
+  sale_value INTEGER NOT NULL,
+  points INTEGER NOT NULL,
+  average_points INTEGER NOT NULL,
+  last_season_points INTEGER NOT NULL,
+  seller TEXT);
+
+DROP TABLE IF EXISTS team;
+CREATE TABLE team (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   player_id TEXT NOT NULL,
   name TEXT NOT NULL,
   team TEXT NOT NULL,

@@ -70,12 +70,54 @@ class ApiClient:
         # print(round((end_value - ini_value) * 100 / ini_value))
         return round((end_value - ini_value) * 100 / ini_value)
 
+    def get_operations(self):
+        response = requests.get(self.config.get("history_url"), headers=self.headers)
+        if response.status_code != 200:
+            self.logger.error('Get operations %s - Error: %s' % (response.status_code, response.reason))
+        response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
+        self.logger.info('Get operations %s - Ok: %s' % (response.status_code, response_dict))
+        response = []
+        for operation in response_dict:
+            type = operation['operation']
+            value = operation['money']
+            timestamp = operation['date']
+            player_id = operation['player']['id']
+            player_name = operation['player']['nickname']
+            player_position = operation['player']['positionId']
+            # print((player_id, player_name, player_position, type, value, timestamp))
+            response.append({"player_id": player_id, "name": player_name, "pos": player_position,
+                             "type": type, "value": value, "timestamp": timestamp})
+        return response
+
     def get_players(self):
-        response = requests.get(self.config.get("team_url"), headers=self.headers)
+        response = requests.get(self.config.get("players_url"), headers=self.headers)
         if response.status_code != 200:
             self.logger.error('Get players %s - Error: %s' % (response.status_code, response.reason))
         response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
         self.logger.info('Get players %s - Ok: %s' % (response.status_code, response_dict))
+        players = []
+        for player in response_dict:
+            position = player['positionId']
+            if position == 5:
+                continue;
+            name = player['nickname']
+            team = player['team']['slug']
+            status = player['playerStatus']
+            value = player['marketValue']
+            points = player['points']
+            average_points = player['averagePoints']
+            last_season_points = player['lastSeasonPoints'] if 'lastSeasonPoints' in player else 0
+            seller = player['manager']['managerName'] if 'manager' in player else None
+            # print(name, team, position, status, value, points, average_points, last_season_points, seller)
+            players.append((name, team, position, status, value, points, average_points, last_season_points, seller))
+        return players
+
+    def get_team(self):
+        response = requests.get(self.config.get("team_url"), headers=self.headers)
+        if response.status_code != 200:
+            self.logger.error('Get team %s - Error: %s' % (response.status_code, response.reason))
+        response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
+        self.logger.info('Get team %s - Ok: %s' % (response.status_code, response_dict))
         manager = response_dict['manager']['managerName']
         team_money = response_dict['teamMoney']
         team_value = response_dict['teamValue']
@@ -100,30 +142,12 @@ class ApiClient:
                             percent_change_3d, clause, clause_tt, points))
         return team_dict, players
 
-    def get_operations(self):
-        response = requests.get(self.config.get("history_url"), headers=self.headers)
-        if response.status_code != 200:
-            self.logger.error('Get players %s - Error: %s' % (response.status_code, response.reason))
-        response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
-        self.logger.info('Get players %s - Ok: %s' % (response.status_code, response_dict))
-        response = []
-        for operation in response_dict:
-            type = operation['operation']
-            value = operation['money']
-            timestamp = operation['date']
-            player_id = operation['player']['id']
-            player_name = operation['player']['nickname']
-            player_position = operation['player']['positionId']
-            # print((player_id, player_name, player_position, type, value, timestamp))
-            response.append({"player_id": player_id, "name": player_name, "pos": player_position,
-                             "type": type, "value": value, "timestamp": timestamp})
-        return response
-
 
 if __name__ == "__main__":
     configuration = Config()
     api_client = ApiClient(configuration)
     # api_client.get_operations()
-    api_client.get_players()
+    # api_client.get_team()
     # api_client.get_market_variation('230')
     # api_client.get_market()
+    api_client.get_players()

@@ -39,7 +39,7 @@ def login_action():
     if user.get_user_name() == form_user and user.login(form_password) \
             and login_user(user=user, remember=True, duration=timedelta(days=30)):
         logger.info("User %s authenticated" % form_user)
-        return redirect("/players")
+        return redirect("/team")
     else:
         user.logout()
         logger.warning("Authentication error %s %s" % (form_user, form_password))
@@ -49,7 +49,7 @@ def login_action():
 @app.route('/', methods=['GET'])
 @login_required
 def root():
-    return redirect("/players")
+    return redirect("/team")
 
 
 @app.route('/market', methods=['GET'])
@@ -66,6 +66,26 @@ def market_json():
     return database.get_market()
 
 
+@app.route('/players', methods=['GET'])
+@login_required
+def players():
+    database = Database(config)
+    money, value, points = database.get_team_status()
+    return render_template("players.html", points=points, cash=money, team=value, total=(money + value))
+
+
+@app.route('/players.json', methods=['GET'])
+def players_json():
+    database = Database(config)
+    return database.get_players()
+
+
+@app.route('/players-top.json', methods=['GET'])
+def players_top_json():
+    database = Database(config)
+    return database.get_players_top()
+
+
 @app.route('/operations', methods=['GET'])
 @login_required
 def operations():
@@ -80,18 +100,18 @@ def operations_json():
     return database.get_operations()
 
 
-@app.route('/players', methods=['GET'])
+@app.route('/team', methods=['GET'])
 @login_required
-def players():
+def team():
     database = Database(config)
     money, value, points = database.get_team_status()
-    return render_template("players.html", points=points, cash=money, team=value, total=(money + value))
+    return render_template("team.html", points=points, cash=money, team=value, total=(money + value))
 
 
-@app.route('/players.json', methods=['GET'])
-def players_json():
+@app.route('/team.json', methods=['GET'])
+def team_json():
     database = Database(config)
-    return database.get_players()
+    return database.get_team()
 
 
 @app.route('/favicon.ico', methods=['GET'])

@@ -95,10 +95,14 @@
                     value = 'EDU';
                 } else if (value === 'liebana_team') {
                     value = 'LIE';
+                } else if (value === 'Moncho RoMa') {
+                    value = 'RAM';
                 } else if (value === 'Nicojeda') {
                     value = 'NIC';
                 } else if (value === 'Cocolan FC') {
                     value = 'COC';
+                } else if (value === 'sporting cocolan') {
+                    value = 'SPO';
                 }
                 return '<span class="owner own-' + value + '">' + value + '</span>';
             }
@@ -191,6 +195,30 @@
                 return (total_3d * 100 / total_sale).toFixed(0) + '%';
             }
 
+            function footPointsFormatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    total = total + parseFloat(data.points);
+                });
+                return total;
+            }
+
+            function footPointsAvgFormatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    total = total + parseFloat(data.avgPoints);
+                });
+                return total;
+            }
+
+            function footPointsLstFormatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    total = total + parseFloat(data.lastSeasonPoints);
+                });
+                return total;
+            }
+
             function cellStyleValue(value, row, index) {
                 var scale = Math.min(Math.floor(value / 10), 9);
                 return {
@@ -214,7 +242,7 @@
         </script>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/players">
+                <a class="navbar-brand" href="/team">
                     <img src="/images/futbol.png" alt="Logo" width="26"
                          height="26" class="d-inline-block align-text-top">
                     Fantasy
@@ -227,13 +255,16 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/players">Players</a>
+                            <a class="nav-link" aria-current="page" href="/team">Team</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/operations">Operations</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/market">Market</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/players">Players</a>
                         </li>
                     </ul>
                     <table class="d-flex right">

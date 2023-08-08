@@ -43,6 +43,51 @@ class Database:
         # print(json.dumps(result))
         return json.dumps(result)
 
+    def get_players(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT name, team, pos, status, sale_value, points, average_points, last_season_points, seller "
+                       "FROM players ORDER BY points DESC, last_season_points DESC")
+        rows = cursor.fetchall()
+        result = []
+        for row in rows:
+            result.append({"name": row[0], "team": row[1], "pos": row[2], "status": row[3],
+                           "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
+                           "points": row[5], "avgPoints": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
+        # print(json.dumps(result))
+        return json.dumps(result)
+
+    def get_players_top(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT name, team, pos, status, sale_value, points, average_points, last_season_points, seller "
+                       "FROM players ORDER BY points DESC, last_season_points DESC, sale_value ASC")
+        rows = cursor.fetchall()
+        result = []
+        goalkeepers = 0
+        defenders = 0
+        midfielders = 0
+        strikers = 0
+        for row in rows:
+            if row[3] != 'ok':
+                continue
+            if (row[2] == 1 and goalkeepers < 1) or (row[2] == 2 and defenders < 5) \
+                    or (row[2] == 3 and midfielders < 5 and (midfielders + strikers) < 7) \
+                    or (row[2] == 4 and strikers < 3 and (midfielders + strikers) < 7):
+                result.append({"name": row[0], "team": row[1], "pos": row[2], "status": row[3],
+                               "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
+                               "points": row[5], "avgPoints": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
+                if row[2] == 1:
+                    goalkeepers += 1
+                elif row[2] == 2:
+                    defenders += 1
+                elif row[2] == 3:
+                    midfielders += 1
+                elif row[2] == 4:
+                    strikers += 1
+                if len(result) == 11:
+                    break
+        # print(json.dumps(result))
+        return json.dumps(result)
+
     def get_operations(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, pos, buy_tt, buy_value, sale_tt, sale_value FROM operations "
@@ -66,10 +111,15 @@ class Database:
         # print(json.dumps(result))
         return json.dumps(result)
 
-    def get_players(self):
+    def get_status(self, key):
+        cursor = self.connection.cursor()
+        cursor.execute(f"SELECT status_value FROM status WHERE status_key = '{key}'")
+        return cursor.fetchone()[0]
+
+    def get_team(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, team, pos, status, buy_value, sale_value, clause_value, clause_tt, "
-                       "percent_change_3d, points FROM players ORDER BY pos ASC, sale_value DESC")
+                       "percent_change_3d, points FROM team ORDER BY pos ASC, sale_value DESC")
         rows = cursor.fetchall()
         result = []
         value_list = []
@@ -91,16 +141,19 @@ class Database:
         # print(json.dumps(result))
         return json.dumps(result)
 
-    def get_status(self, key):
-        cursor = self.connection.cursor()
-        cursor.execute(f"SELECT status_value FROM status WHERE status_key = '{key}'")
-        return cursor.fetchone()[0]
-
     def get_team_status(self):
         money = round(int(self.get_status('team_money')) / 1000000)
         value = round(int(self.get_status('team_value')) / 1000000)
         points = self.get_status('team_points')
         return money, value, points
+
+    def update_market(self):
+        cursor = self.connection.cursor()
+        market = self.api_client.get_market()
+        cursor.execute('DELETE FROM market')
+        cursor.executemany('INSERT INTO market(name,team,pos,status,buy_value,percent_change_3d,points,'
+                           'avgPoints,bids,myBid,seller) VALUES(?,?,?,?,?,?,?,?,?,?,?)', market)
+        self.connection.commit()
 
     def update_operations(self):
         cursor = self.connection.cursor()
@@ -128,17 +181,20 @@ class Database:
             self.update_status(cursor, 'last_operation', latest_operation)
         self.connection.commit()
 
-    def update_market(self):
-        cursor = self.connection.cursor()
-        market = self.api_client.get_market()
-        cursor.execute('DELETE FROM market')
-        cursor.executemany('INSERT INTO market(name,team,pos,status,buy_value,percent_change_3d,points,'
-                           'avgPoints,bids,myBid,seller) VALUES(?,?,?,?,?,?,?,?,?,?,?)', market)
-        self.connection.commit()
-
     def update_players(self):
         cursor = self.connection.cursor()
-        team, players = self.api_client.get_players()
+        players = self.api_client.get_players()
+        cursor.execute('DELETE FROM players')
+        cursor.executemany('INSERT INTO players(name, team, pos, status, sale_value, points, average_points, '
+                           'last_season_points, seller) VALUES(?,?,?,?,?,?,?,?,?)', players)
+        self.connection.commit()
+
+    def update_status(self, cursor, key, value):
+        cursor.execute(f"UPDATE status SET status_value = '{value}' where status_key = '{key}'")
+
+    def update_team(self):
+        cursor = self.connection.cursor()
+        team, players = self.api_client.get_team()
         players_db = []
         for player in players:
             cursor.execute(f"SELECT buy_tt, buy_value FROM operations "
@@ -150,22 +206,22 @@ class Database:
         self.update_status(cursor, 'team_money', team['team_money'])
         self.update_status(cursor, 'team_value', team['team_value'])
         self.update_status(cursor, 'team_points', team['team_points'])
-        cursor.execute('DELETE FROM players')
-        cursor.executemany('INSERT INTO players(player_id,name,team,pos,status,buy_tt,buy_value,sale_value,'
+        cursor.execute('DELETE FROM team')
+        cursor.executemany('INSERT INTO team(player_id,name,team,pos,status,buy_tt,buy_value,sale_value,'
                            'percent_change_3d,clause_value,clause_tt,points) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
                            players_db)
         self.connection.commit()
-
-    def update_status(self, cursor, key, value):
-        cursor.execute(f"UPDATE status SET status_value = '{value}' where status_key = '{key}'")
 
 
 if __name__ == "__main__":
     configuration = Config()
     database = Database(configuration)
-    database.update_operations()
+    # database.update_operations()
     # database.get_operations()
-    database.update_players()
-    # database.get_players()
-    database.update_market()
+    # database.update_team()
+    # database.get_team()
+    # database.update_market()
     # database.get_market()
+    # database.update_players()
+    # database.get_players()
+    database.get_players_top()
