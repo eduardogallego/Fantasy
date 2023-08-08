@@ -49,8 +49,10 @@ class Database:
                        "FROM players ORDER BY points DESC, last_season_points DESC")
         rows = cursor.fetchall()
         result = []
+        index = 0
         for row in rows:
-            result.append({"name": row[0], "team": row[1], "pos": row[2], "status": row[3],
+            index += 1
+            result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
                            "points": row[5], "avgPoints": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
         # print(json.dumps(result))
@@ -66,13 +68,15 @@ class Database:
         defenders = 0
         midfielders = 0
         strikers = 0
+        index = 0
         for row in rows:
             if row[3] != 'ok':
                 continue
             if (row[2] == 1 and goalkeepers < 1) or (row[2] == 2 and defenders < 5) \
                     or (row[2] == 3 and midfielders < 5 and (midfielders + strikers) < 7) \
                     or (row[2] == 4 and strikers < 3 and (midfielders + strikers) < 7):
-                result.append({"name": row[0], "team": row[1], "pos": row[2], "status": row[3],
+                index += 1
+                result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
                                "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
                                "points": row[5], "avgPoints": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
                 if row[2] == 1:
