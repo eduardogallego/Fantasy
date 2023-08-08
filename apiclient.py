@@ -1,7 +1,9 @@
 import json
 import logging
+import os
 import requests
 
+from time import time
 from utils import Config
 
 
@@ -10,13 +12,12 @@ class ApiClient:
     def __init__(self, config):
         self.logger = logging.getLogger('api-client')
         self.config = config
+        access_token = None
+        token_type = None
         self.headers = {
             'Accept': 'application/json, text/plain, */*',
             'Accept-Encoding': 'gzip, deflate, br',
             'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8,gl;q=0.7',
-            'Access-Control-Allow-Credentials': 'true',
-            'Access-Control-Allow-Origin': '*',
-            'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IkNBdXdPcWRMN2YyXzlhTVhZX3ZkbEcyVENXbVV4aklXV1MwNVB4WHljcUkiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJOb3Qgc3VwcG9ydGVkIGN1cnJlbnRseS4gVXNlIG9pZCBjbGFpbS4iLCJleHRlbnNpb25fVXNlclByb2ZpbGVJZCI6IjYzNjFlM2M2LTU3OTUtNGNmNC05MzYzLTc3MDIzNDU1YjI1OSIsIm9pZCI6IjYzNjFlM2M2LTU3OTUtNGNmNC05MzYzLTc3MDIzNDU1YjI1OSIsImV4dGVuc2lvbl9FbWFpbFZlcmlmaWVkIjp0cnVlLCJhenAiOiJmZWM5ZTNmZC04Zjg4LTQ1YWItOGNiZC1iNzBiOWQ2NWRkZTAiLCJ2ZXIiOiIxLjAiLCJpYXQiOjE2OTE0Mzc0NjIsImF1ZCI6ImZlYzllM2ZkLThmODgtNDVhYi04Y2JkLWI3MGI5ZDY1ZGRlMCIsImV4cCI6MTY5MTUyMzg2MiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5sYWxpZ2EuZXMvMzM1MzE2ZWItZjYwNi00MzYxLWJiODYtMzVhN2VkY2RjZWMxL3YyLjAvIiwibmJmIjoxNjkxNDM3NDYyfQ.QMZ6l_7OEYYczOtgbEjUnA1wYAYt7pqhON_cZxUkPZrg-v8lVoBn3Lk6vT8Vm-c6QN1hfg5DAKRxxgKWV65-phbfGsKLOJmGSSYwxDygwB7336wx1QQyQEMMMMzdAzGYlqMWABZ4ZTzmxM7bLHy4tgZTX849349cUUTsR-JYqK1SosSpmbgz_OiHvPZhFrNxa4r21OlGd6vvuYld8VMGC2IEuXbmCFM1YO-yVNTNuAfmX6F3L1Oo-VJiA8TJ4ZKNDv7GhNOa7DGvRLHI2oFQmgDkw7kKAzeIY29kwoBnMFQMGdTXXxPN2oDSmB-rC-MTT3skqHU4Z1dWn8Af2RJpUw',
             'Origin': 'https://fantasy.laliga.com',
             'Referer': 'https://fantasy.laliga.com/',
             'Sec-Ch-Ua': '"Not/A)Brand";v="99", "Google Chrome";v="115", "Chromium";v="115"',
@@ -25,10 +26,42 @@ class ApiClient:
             'Sec-Fetch-Dest': 'empty',
             'Sec-Fetch-Mode': 'cors',
             'Sec-Fetch-Site': 'cross-site',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
+                          '(KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
             'X-App': 'Fantasy-web',
             'X-Lang': 'es'
         }
+        self.auth_headers = self.headers.copy()
+        self.auth_headers['Content-Type'] = 'application/json'
+        while access_token is None or token_type is None:
+            if os.path.isfile(config.get('credentials_file')):
+                with open(config.get('credentials_file')) as input_file:
+                    credentials = json.load(input_file)
+                access_token = credentials['access_token']
+                expires_on = credentials['expires_on']
+                token_type = credentials['token_type']
+                if int(time()) < expires_on:
+                    break
+            self.authenticate()
+        self.headers['Access-Control-Allow-Credentials'] = 'true'
+        self.headers['Access-Control-Allow-Origin'] = '*'
+        self.headers['Authorization'] = f"{token_type} {access_token}"
+
+    def authenticate(self):
+        auth_dict = {"policy": "B2C_1A_ResourceOwnerv2", "username": self.config.get('user_name'),
+                     "password": self.config.get('user_password')}
+        response = requests.post(self.config.get("auth_url"), json=auth_dict, headers=self.auth_headers)
+        if response.status_code != 200:
+            self.logger.error('Authenticate %s - Error: %s' % (response.status_code, response.reason))
+        response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
+        token_dict = {"code": response_dict['code'], "policy": "B2C_1A_ResourceOwnerv2"}
+        response = requests.post(self.config.get("token_url"), json=token_dict, headers=self.auth_headers)
+        if response.status_code != 200:
+            self.logger.error('Token %s - Error: %s' % (response.status_code, response.reason))
+        response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
+        with open(self.config.get('credentials_file'), 'w') as outfile:
+            json.dump({'access_token': response_dict['access_token'], 'expires_on': response_dict['expires_on'],
+                       'token_type': response_dict['token_type']}, outfile)
 
     def get_market(self):
         response = requests.get(self.config.get("market_url"), headers=self.headers)
@@ -52,7 +85,6 @@ class ApiClient:
             myBid = entry['bid']['money'] if 'bid' in entry else None
             seller = entry['sellerTeam']['manager']['managerName'] if 'sellerTeam' in entry else None
             market_variation_3d = self.get_market_variation_3d(player_id)
-            # print(player, team, position, status, value, market_variation_3d, points, avgPoints, bids, myBid, seller)
             response.append((player, team, position, status, value, market_variation_3d,
                              points, avgPoints, bids, myBid, seller))
         return response
@@ -67,7 +99,6 @@ class ApiClient:
         history_size = min(len(response_list), 3)
         end_value = response_list[len(response_list) - 1]['marketValue']
         ini_value = response_list[len(response_list) - history_size - 1]['marketValue']
-        # print(round((end_value - ini_value) * 100 / ini_value))
         return round((end_value - ini_value) * 100 / ini_value)
 
     def get_operations(self):
@@ -78,15 +109,14 @@ class ApiClient:
         self.logger.info('Get operations %s - Ok: %s' % (response.status_code, response_dict))
         response = []
         for operation in response_dict:
-            type = operation['operation']
+            operation_type = operation['operation']
             value = operation['money']
             timestamp = operation['date']
             player_id = operation['player']['id']
             player_name = operation['player']['nickname']
             player_position = operation['player']['positionId']
-            # print((player_id, player_name, player_position, type, value, timestamp))
             response.append({"player_id": player_id, "name": player_name, "pos": player_position,
-                             "type": type, "value": value, "timestamp": timestamp})
+                             "type": operation_type, "value": value, "timestamp": timestamp})
         return response
 
     def get_players(self):
@@ -108,7 +138,6 @@ class ApiClient:
             average_points = player['averagePoints']
             last_season_points = player['lastSeasonPoints'] if 'lastSeasonPoints' in player else 0
             seller = player['manager']['managerName'] if 'manager' in player else None
-            # print(name, team, position, status, value, points, average_points, last_season_points, seller)
             players.append((name, team, position, status, value, points, average_points, last_season_points, seller))
         return players
 
@@ -122,7 +151,6 @@ class ApiClient:
         team_money = response_dict['teamMoney']
         team_value = response_dict['teamValue']
         team_points = response_dict['teamPoints']
-        # print(manager, team_money, team_value, team_points')
         team_dict = {'team_manager': manager, 'team_money': team_money,
                      'team_value': team_value, 'team_points': team_points}
         players = []
@@ -137,7 +165,6 @@ class ApiClient:
             clause = player['buyoutClause']
             clause_tt = player['buyoutClauseLockedEndTime']
             percent_change_3d = self.get_market_variation_3d(player_id)
-            # print(name, player_id, team, position, status, value, percent_change_3d, clause, clause_tt, points)
             players.append((player_id, name, team, position, status, value,
                             percent_change_3d, clause, clause_tt, points))
         return team_dict, players
@@ -146,8 +173,10 @@ class ApiClient:
 if __name__ == "__main__":
     configuration = Config()
     api_client = ApiClient(configuration)
-    # api_client.get_operations()
-    # api_client.get_team()
-    # api_client.get_market_variation('230')
-    # api_client.get_market()
-    api_client.get_players()
+    # print(json.dumps(api_client.get_market()))
+    # print(json.dumps(api_client.get_market_variation_3d('58')))
+    # print(json.dumps(api_client.get_operations()))
+    # print(json.dumps(api_client.get_players()))
+    # team_dict, players = api_client.get_team()
+    # print(json.dumps(team_dict))
+    # print(json.dumps(players))

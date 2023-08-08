@@ -1,5 +1,6 @@
 /.idea/
 /config/config.json
+/config/credentials.json
 /fantasy.log
 /venv/
 /workingdir/
