@@ -52,23 +52,27 @@ class ApiClient:
                      "password": self.config.get('user_password')}
         response = requests.post(self.config.get("auth_url"), json=auth_dict, headers=self.auth_headers)
         if response.status_code != 200:
-            self.logger.error('Authenticate %s - Error: %s' % (response.status_code, response.reason))
+            self.logger.error('Authentication %s - Error: %s' % (response.status_code, response.reason))
+            return
         response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
         token_dict = {"code": response_dict['code'], "policy": "B2C_1A_ResourceOwnerv2"}
         response = requests.post(self.config.get("token_url"), json=token_dict, headers=self.auth_headers)
         if response.status_code != 200:
             self.logger.error('Token %s - Error: %s' % (response.status_code, response.reason))
+            return
         response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
         with open(self.config.get('credentials_file'), 'w') as outfile:
             json.dump({'access_token': response_dict['access_token'], 'expires_on': response_dict['expires_on'],
                        'token_type': response_dict['token_type']}, outfile)
+        self.logger.info('Authentication Ok: %s' % response.status_code)
 
     def get_market(self):
         response = requests.get(self.config.get("market_url"), headers=self.headers)
         if response.status_code != 200:
             self.logger.error('Get market %s - Error: %s' % (response.status_code, response.reason))
+            return
         response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
-        self.logger.info('Get market %s - Ok: %s' % (response.status_code, response_dict))
+        self.logger.info('Get market %s - Ok' % response.status_code)
         response = []
         for entry in response_dict:
             position = entry['playerMaster']['positionId']
@@ -80,13 +84,13 @@ class ApiClient:
             status = entry['playerMaster']['playerStatus']
             value = entry['playerMaster']['marketValue']
             points = entry['playerMaster']['points']
-            avgPoints = entry['playerMaster']['averagePoints']
+            avg_points = entry['playerMaster']['averagePoints']
             bids = entry['numberOfBids'] if 'numberOfBids' in entry else None
-            myBid = entry['bid']['money'] if 'bid' in entry else None
+            my_bid = entry['bid']['money'] if 'bid' in entry else None
             seller = entry['sellerTeam']['manager']['managerName'] if 'sellerTeam' in entry else None
             market_variation_3d = self.get_market_variation_3d(player_id)
             response.append((player, team, position, status, value, market_variation_3d,
-                             points, avgPoints, bids, myBid, seller))
+                             points, avg_points, bids, my_bid, seller))
         return response
 
     def get_market_variation_3d(self, player_id):
@@ -94,8 +98,9 @@ class ApiClient:
         if response.status_code != 200:
             self.logger.error('Get player %s marked value %s - Error: %s'
                               % (player_id, response.status_code, response.reason))
+            return
         response_list = json.loads(response.text.encode().decode('utf-8-sig'))
-        self.logger.info('Get player %s marked value %s - Ok: %s' % (player_id, response.status_code, response_list))
+        self.logger.info('Get player %s marked value %s - Ok' % (player_id, response.status_code))
         history_size = min(len(response_list), 3)
         end_value = response_list[len(response_list) - 1]['marketValue']
         ini_value = response_list[len(response_list) - history_size - 1]['marketValue']
@@ -105,8 +110,9 @@ class ApiClient:
         response = requests.get(self.config.get("history_url"), headers=self.headers)
         if response.status_code != 200:
             self.logger.error('Get operations %s - Error: %s' % (response.status_code, response.reason))
+            return
         response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
-        self.logger.info('Get operations %s - Ok: %s' % (response.status_code, response_dict))
+        self.logger.info('Get operations %s - Ok' % response.status_code)
         response = []
         for operation in response_dict:
             operation_type = operation['operation']
@@ -123,8 +129,9 @@ class ApiClient:
         response = requests.get(self.config.get("players_url"), headers=self.headers)
         if response.status_code != 200:
             self.logger.error('Get players %s - Error: %s' % (response.status_code, response.reason))
+            return
         response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
-        self.logger.info('Get players %s - Ok: %s' % (response.status_code, response_dict))
+        self.logger.info('Get players %s - Ok' % response.status_code)
         players = []
         for player in response_dict:
             position = player['positionId']
@@ -145,8 +152,9 @@ class ApiClient:
         response = requests.get(self.config.get("team_url"), headers=self.headers)
         if response.status_code != 200:
             self.logger.error('Get team %s - Error: %s' % (response.status_code, response.reason))
+            return
         response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
-        self.logger.info('Get team %s - Ok: %s' % (response.status_code, response_dict))
+        self.logger.info('Get team %s - Ok' % response.status_code)
         manager = response_dict['manager']['managerName']
         team_money = response_dict['teamMoney']
         team_value = response_dict['teamValue']

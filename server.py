@@ -114,6 +114,16 @@ def team_json():
     return database.get_team()
 
 
+@app.route('/update', methods=['GET'])
+def update():
+    database = Database(config)
+    database.update_operations()
+    database.update_team()
+    database.update_market()
+    database.update_players()
+    return redirect("/team")
+
+
 @app.route('/favicon.ico', methods=['GET'])
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'images'),

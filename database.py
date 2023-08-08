@@ -40,7 +40,6 @@ class Database:
                            "points": row[6], "avgPoints": row[7], "bids": row[8],
                            "myBid": '{0:.2f}'.format(round(row[9] / 1000000, 2)) if row[9] is not None else None,
                            "seller": row[10]})
-        # print(json.dumps(result))
         return json.dumps(result)
 
     def get_players(self):
@@ -55,7 +54,6 @@ class Database:
             result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
                            "points": row[5], "avgPoints": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
-        # print(json.dumps(result))
         return json.dumps(result)
 
     def get_players_top(self):
@@ -89,7 +87,6 @@ class Database:
                     strikers += 1
                 if len(result) == 11:
                     break
-        # print(json.dumps(result))
         return json.dumps(result)
 
     def get_operations(self):
@@ -112,7 +109,6 @@ class Database:
                            "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
                            "benefit": '{0:.2f}'.format(round(benefit / 1000000, 2)),
                            "percent": round((row[5] - row[3]) * 100 / row[3], 0)})
-        # print(json.dumps(result))
         return json.dumps(result)
 
     def get_status(self, key):
@@ -142,7 +138,6 @@ class Database:
                            "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
                            "percent_chg_3d": row[8],
                            "points": row[9]})
-        # print(json.dumps(result))
         return json.dumps(result)
 
     def get_team_status(self):
@@ -221,11 +216,11 @@ if __name__ == "__main__":
     configuration = Config()
     database = Database(configuration)
     # database.update_operations()
-    # database.get_operations()
+    # print(json.dumps(database.get_operations()))
     # database.update_team()
-    # database.get_team()
+    # print(json.dumps(database.get_team()))
     # database.update_market()
-    # database.get_market()
+    # print(json.dumps(database.get_market()))
     # database.update_players()
-    # database.get_players()
-    database.get_players_top()
+    # print(json.dumps(database.get_players()))
+    # print(json.dumps(database.get_players_top()))
