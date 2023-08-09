@@ -1,7 +1,7 @@
 #!/bin/bash
 
 status() {
-  pid=$(ps -ef | grep server.py | grep -v grep | awk '{print $2}')
+  pid=$(ps -ef | grep fantasy.py | grep -v grep | awk '{print $2}')
   if [ -z "$pid" ]
     then
       echo "Not running"
@@ -11,7 +11,7 @@ status() {
 }
 
 start() {
-  pid=$(ps -ef | grep server.py | grep -v grep | awk '{print $2}')
+  pid=$(ps -ef | grep fantasy.py | grep -v grep | awk '{print $2}')
   if [ -z "$pid" ]
     then
       SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -22,7 +22,7 @@ start() {
 }
 
 stop() {
-  pid=$(ps -ef | grep server.py | grep -v grep | awk '{print $2}')
+  pid=$(ps -ef | grep fantasy.py | grep -v grep | awk '{print $2}')
   if [ -n "$pid" ]
     then
       kill -9 $pid
