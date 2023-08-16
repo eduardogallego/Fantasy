@@ -130,6 +130,8 @@
                     return (value / 3600).toFixed(0) + 'h'
                 } else if (value > 60) {
                     return (value / 60).toFixed(0) + 'm'
+                } else if (value < 0) {
+                    return 0;
                 } else {
                     return value + 's';
                 }
