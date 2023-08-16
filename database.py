@@ -45,7 +45,7 @@ class Database:
     def get_players(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, team, pos, status, sale_value, points, average_points, last_season_points, seller "
-                       "FROM players ORDER BY points DESC, last_season_points DESC")
+                       "FROM players ORDER BY points DESC, sale_value ASC")
         rows = cursor.fetchall()
         result = []
         index = 0
@@ -59,7 +59,7 @@ class Database:
     def get_players_top(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, team, pos, status, sale_value, points, average_points, last_season_points, seller "
-                       "FROM players ORDER BY points DESC, last_season_points DESC, sale_value ASC")
+                       "FROM players ORDER BY points DESC, sale_value ASC")
         rows = cursor.fetchall()
         result = []
         goalkeepers = 0
@@ -70,8 +70,8 @@ class Database:
         for row in rows:
             if row[3] != 'ok':
                 continue
-            if (row[2] == 1 and goalkeepers < 1) or (row[2] == 2 and defenders < 5) \
-                    or (row[2] == 3 and midfielders < 5 and (midfielders + strikers) < 7) \
+            if (row[2] == 1 and goalkeepers < 1) or (row[2] == 2 and defenders < 5 and (defenders + midfielders) < 10)\
+                    or (row[2] == 3 and midfielders < 5 and (midfielders + strikers) < 7 and (defenders + midfielders) < 10) \
                     or (row[2] == 4 and strikers < 3 and (midfielders + strikers) < 7):
                 index += 1
                 result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
