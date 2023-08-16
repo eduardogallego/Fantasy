@@ -124,10 +124,10 @@ class Database:
         result = []
         value_list = []
         for row in rows:
-            value_list.append(row[6])
+            value_list.append(row[9])
         list.sort(value_list, reverse=True)
         for row in rows:
-            index = value_list.index(row[6]) + 1
+            index = value_list.index(row[9]) + 1
             clause_secs = round((datetime.fromisoformat(row[7]) - datetime.now(timezone.utc)).total_seconds())
             result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
