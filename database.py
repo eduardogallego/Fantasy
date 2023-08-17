@@ -70,8 +70,9 @@ class Database:
         for row in rows:
             if row[3] != 'ok':
                 continue
-            if (row[2] == 1 and goalkeepers < 1) or (row[2] == 2 and defenders < 5 and (defenders + midfielders) < 10)\
-                    or (row[2] == 3 and midfielders < 5 and (midfielders + strikers) < 7 and (defenders + midfielders) < 10) \
+            if (row[2] == 1 and goalkeepers < 1) or (row[2] == 2 and defenders < 5 and (defenders + midfielders) < 9)\
+                    or (row[2] == 3 and midfielders < 5 and (midfielders + strikers) < 7
+                        and (defenders + midfielders) < 9) \
                     or (row[2] == 4 and strikers < 3 and (midfielders + strikers) < 7):
                 index += 1
                 result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
@@ -221,6 +222,6 @@ if __name__ == "__main__":
     # print(json.dumps(database.get_team()))
     # database.update_market()
     # print(json.dumps(database.get_market()))
-    # database.update_players()
+    database.update_players()
     # print(json.dumps(database.get_players()))
-    # print(json.dumps(database.get_players_top()))
+    print(json.dumps(database.get_players_top()))
