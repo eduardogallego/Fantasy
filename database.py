@@ -130,10 +130,18 @@ class Database:
         for row in rows:
             index = value_list.index(row[9]) + 1
             clause_secs = round((datetime.fromisoformat(row[7]) - datetime.now(timezone.utc)).total_seconds())
+            clause = '{0:.2f}'.format(round(row[6] / 1000000, 2))
+            if clause_secs > 86400:
+                clause = f'{round(clause_secs / 86400)}d'
+            elif clause_secs > 3600:
+                clause = f'{round(clause_secs / 3600)}h'
+            elif clause_secs > 60:
+                clause = f'{round(clause_secs / 60)}m'
+            elif clause_secs > 0:
+                clause = f'{clause_secs}s'
             result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
-                           "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
-                           "clause_value": '{0:.2f}'.format(round(row[6] / 1000000, 2)), "clause_secs": clause_secs,
+                           "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)), "clause": clause,
                            "benefit": '{0:.2f}'.format(round((row[5] - row[4]) / 1000000, 2)),
                            "percent_ben": round((row[5] - row[4]) * 100 / row[4]),
                            "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),

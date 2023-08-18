@@ -185,6 +185,6 @@ if __name__ == "__main__":
     # print(json.dumps(api_client.get_market_variation_3d('58')))
     # print(json.dumps(api_client.get_operations()))
     # print(json.dumps(api_client.get_players()))
-    # team_dict, players = api_client.get_team()
+    team_dict, players = api_client.get_team()
     # print(json.dumps(team_dict))
     # print(json.dumps(players))

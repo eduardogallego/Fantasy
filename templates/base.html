@@ -123,20 +123,6 @@
                 return '<span class="status status-' + status + '">' + status + '</span>';
             }
 
-            function deltaSecsFormatter(value, row) {
-                if (value > 86400) {
-                    return (value / 86400).toFixed(0) + 'd'
-                } else if (value > 3600) {
-                    return (value / 3600).toFixed(0) + 'h'
-                } else if (value > 60) {
-                    return (value / 60).toFixed(0) + 'm'
-                } else if (value < 0) {
-                    return 0;
-                } else {
-                    return value + 's';
-                }
-            }
-
             function footItemCountFormatter(data) {
                 return data.length;
             }
@@ -225,6 +211,23 @@
                 var scale = Math.min(Math.floor(value / 10), 9);
                 return {
                     classes: 'right scale-' + scale
+                }
+            }
+
+            function clauseStyleValue(value, row, index) {
+                if (value === '1d' || value === '2d') {
+                    return {
+                        classes: 'right warning'
+                    }
+                } else if (value.indexOf('h') > -1 || value.indexOf('m') > -1 || value.indexOf('s') > -1) {
+                    return {
+                        classes: 'right error'
+                    }
+                } else {
+                    var scale = Math.min(Math.floor(value / 10), 9);
+                    return {
+                        classes: 'right scale-' + scale
+                    }
                 }
             }
 
