@@ -8,7 +8,7 @@ CREATE TABLE market (
   buy_value INTEGER NOT NULL,
   percent_change_3d INTEGER NOT NULL,
   points INTEGER NOT NULL,
-  avgPoints INTEGER NOT NULL,
+  average INTEGER NOT NULL,
   bids INTEGER,
   myBid INTEGER,
   seller TEXT);
@@ -52,7 +52,9 @@ CREATE TABLE team (
   percent_change_3d INTEGER NOT NULL,
   clause_value INTEGER NOT NULL,
   clause_tt TIMESTAMP NOT NULL,
-  points INTEGER NOT NULL);
+  points INTEGER NOT NULL,
+  matches INTEGER NOT NULL,
+  average INTEGER NOT NULL);
 
 DROP TABLE IF EXISTS status;
 CREATE TABLE status (

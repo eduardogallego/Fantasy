@@ -25,8 +25,8 @@ class Database:
 
     def get_market(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, team, pos, status, buy_value, percent_change_3d, points, avgPoints, "
-                       "bids, myBid, seller FROM market ORDER BY avgPoints DESC, percent_change_3d DESC")
+        cursor.execute("SELECT name, team, pos, status, buy_value, percent_change_3d, points, average, "
+                       "bids, myBid, seller FROM market ORDER BY average DESC, percent_change_3d DESC")
         rows = cursor.fetchall()
         result = []
         value_list = []
@@ -36,8 +36,8 @@ class Database:
         for row in rows:
             index = value_list.index(row[4]) + 1
             result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
-                           "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "percent_chg_3d": row[5],
-                           "points": row[6], "avgPoints": row[7], "bids": row[8],
+                           "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
+                           "percent_chg_3d": row[5], "points": row[6], "average": row[7], "bids": row[8],
                            "myBid": '{0:.2f}'.format(round(row[9] / 1000000, 2)) if row[9] is not None else None,
                            "seller": row[10]})
         return json.dumps(result)
@@ -52,8 +52,8 @@ class Database:
         for row in rows:
             index += 1
             result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
-                           "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
-                           "points": row[5], "avgPoints": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
+                           "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "points": row[5],
+                           "average": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
         return json.dumps(result)
 
     def get_players_top(self):
@@ -76,8 +76,8 @@ class Database:
                     or (row[2] == 4 and strikers < 3 and (midfielders + strikers) < 7):
                 index += 1
                 result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
-                               "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
-                               "points": row[5], "avgPoints": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
+                               "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "points": row[5],
+                               "average": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
                 if row[2] == 1:
                     goalkeepers += 1
                 elif row[2] == 2:
@@ -120,15 +120,15 @@ class Database:
     def get_team(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, team, pos, status, buy_value, sale_value, clause_value, clause_tt, "
-                       "percent_change_3d, points FROM team ORDER BY pos ASC, sale_value DESC")
+                       "percent_change_3d, points, matches, average FROM team ORDER BY pos ASC, average DESC")
         rows = cursor.fetchall()
         result = []
         value_list = []
         for row in rows:
-            value_list.append(row[9])
+            value_list.append(row[11])
         list.sort(value_list, reverse=True)
         for row in rows:
-            index = value_list.index(row[9]) + 1
+            index = value_list.index(row[11]) + 1
             clause_secs = round((datetime.fromisoformat(row[7]) - datetime.now(timezone.utc)).total_seconds())
             clause = '{0:.2f}'.format(round(row[6] / 1000000, 2))
             if clause_secs > 86400:
@@ -145,8 +145,8 @@ class Database:
                            "benefit": '{0:.2f}'.format(round((row[5] - row[4]) / 1000000, 2)),
                            "percent_ben": round((row[5] - row[4]) * 100 / row[4]),
                            "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
-                           "percent_chg_3d": row[8],
-                           "points": row[9]})
+                           "percent_chg_3d": row[8], "points": row[9], "matches": row[10],
+                           "average": '{0:.2f}'.format(round(row[11] / 100, 2))})
         return json.dumps(result)
 
     def get_team_status(self):
@@ -160,7 +160,7 @@ class Database:
         market = self.api_client.get_market()
         cursor.execute('DELETE FROM market')
         cursor.executemany('INSERT INTO market(name,team,pos,status,buy_value,percent_change_3d,points,'
-                           'avgPoints,bids,myBid,seller) VALUES(?,?,?,?,?,?,?,?,?,?,?)', market)
+                           'average,bids,myBid,seller) VALUES(?,?,?,?,?,?,?,?,?,?,?)', market)
         self.connection.commit()
 
     def update_operations(self):
@@ -208,16 +208,16 @@ class Database:
             cursor.execute(f"SELECT buy_tt, buy_value FROM operations "
                            f"WHERE player_id = {player[0]} AND sale_tt IS NULL")
             buy_prices = cursor.fetchone()
-            players_db.append((player[0], player[1], player[2], player[3], player[4], buy_prices[0],
-                               buy_prices[1], player[5], player[6], player[7], player[8], player[9]))
+            players_db.append((player[0], player[1], player[2], player[3], player[4], buy_prices[0], buy_prices[1],
+                               player[5], player[6], player[7], player[8], player[9], player[10], player[11]))
         self.update_status(cursor, 'team_manager', team['team_manager'])
         self.update_status(cursor, 'team_money', team['team_money'])
         self.update_status(cursor, 'team_value', team['team_value'])
         self.update_status(cursor, 'team_points', team['team_points'])
         cursor.execute('DELETE FROM team')
         cursor.executemany('INSERT INTO team(player_id,name,team,pos,status,buy_tt,buy_value,sale_value,'
-                           'percent_change_3d,clause_value,clause_tt,points) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
-                           players_db)
+                           'percent_change_3d,clause_value,clause_tt,points,matches,average) '
+                           'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)', players_db)
         self.connection.commit()
 
 
@@ -230,6 +230,6 @@ if __name__ == "__main__":
     # print(json.dumps(database.get_team()))
     # database.update_market()
     # print(json.dumps(database.get_market()))
-    database.update_players()
+    # database.update_players()
     # print(json.dumps(database.get_players()))
-    print(json.dumps(database.get_players_top()))
+    # print(json.dumps(database.get_players_top()))

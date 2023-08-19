@@ -136,7 +136,7 @@ class ApiClient:
         for player in response_dict:
             position = player['positionId']
             if position == 5:
-                continue;
+                continue
             name = player['nickname']
             team = player['team']['slug']
             status = player['playerStatus']
@@ -169,12 +169,19 @@ class ApiClient:
             value = player['playerMaster']['marketValue']
             status = player['playerMaster']['playerStatus']
             team = player['playerMaster']['team']['slug']
-            points = player['playerMaster']['points']
             clause = player['buyoutClause']
             clause_tt = player['buyoutClauseLockedEndTime']
+            points = player['playerMaster']['points']
+            last_stats = player['playerMaster']['lastStats']
+            matches = 0
+            for stat in last_stats:
+                if stat['stats']['mins_played'][0] > 0:
+                    matches += 1
+            average = round(points * 100 / matches) if matches > 0 else 0
+            print(name, points, matches, average)
             percent_change_3d = self.get_market_variation_3d(player_id)
-            players.append((player_id, name, team, position, status, value,
-                            percent_change_3d, clause, clause_tt, points))
+            players.append((player_id, name, team, position, status, value, percent_change_3d,
+                            clause, clause_tt, points, matches, average))
         return team_dict, players
 
 
@@ -185,6 +192,6 @@ if __name__ == "__main__":
     # print(json.dumps(api_client.get_market_variation_3d('58')))
     # print(json.dumps(api_client.get_operations()))
     # print(json.dumps(api_client.get_players()))
-    team_dict, players = api_client.get_team()
+    # team_dict, players = api_client.get_team()
     # print(json.dumps(team_dict))
     # print(json.dumps(players))

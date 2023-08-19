@@ -183,18 +183,28 @@
                 return (total_3d * 100 / total_sale).toFixed(0) + '%';
             }
 
+            function footMatchesFormatter(data) {
+                var matches = 0;
+                data.forEach(function(data) {
+                    if (data.matches > matches) {
+                        matches = data.matches;
+                    }
+                });
+                return matches;
+            }
+
+            function footAverageFormatter(data) {
+                var average = 0;
+                data.forEach(function(data) {
+                    average = average + parseFloat(data.average);
+                });
+                return average;
+            }
+
             function footPointsFormatter(data) {
                 var total = 0;
                 data.forEach(function(data) {
                     total = total + parseFloat(data.points);
-                });
-                return total;
-            }
-
-            function footPointsAvgFormatter(data) {
-                var total = 0;
-                data.forEach(function(data) {
-                    total = total + parseFloat(data.avgPoints);
                 });
                 return total;
             }
