@@ -2,8 +2,8 @@ import json
 import logging
 import os
 import requests
+import time
 
-from time import time
 from utils import Config
 
 
@@ -40,7 +40,7 @@ class ApiClient:
                 access_token = credentials['access_token']
                 expires_on = credentials['expires_on']
                 token_type = credentials['token_type']
-                if int(time()) < expires_on:
+                if int(time.time()) < expires_on:
                     break
             self.authenticate()
         self.headers['Access-Control-Allow-Credentials'] = 'true'
@@ -95,6 +95,7 @@ class ApiClient:
 
     def get_market_variation_3d(self, player_id):
         response = requests.get(self.config.get("market_value_url") % player_id, headers=self.headers)
+        time.sleep(0.2)
         if response.status_code != 200:
             self.logger.error('Get player %s marked value %s - Error: %s'
                               % (player_id, response.status_code, response.reason))
@@ -148,41 +149,42 @@ class ApiClient:
             players.append((name, team, position, status, value, points, average_points, last_season_points, seller))
         return players
 
-    def get_team(self):
-        response = requests.get(self.config.get("team_url"), headers=self.headers)
-        if response.status_code != 200:
-            self.logger.error('Get team %s - Error: %s' % (response.status_code, response.reason))
-            return
-        response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
-        self.logger.info('Get team %s - Ok' % response.status_code)
-        manager = response_dict['manager']['managerName']
-        team_money = response_dict['teamMoney']
-        team_value = response_dict['teamValue']
-        team_points = response_dict['teamPoints']
-        team_dict = {'team_manager': manager, 'team_money': team_money,
-                     'team_value': team_value, 'team_points': team_points}
-        players = []
-        for player in response_dict['players']:
-            player_id = player['playerMaster']['id']
-            name = player['playerMaster']['nickname']
-            position = player['playerMaster']['positionId']
-            value = player['playerMaster']['marketValue']
-            status = player['playerMaster']['playerStatus']
-            team = player['playerMaster']['team']['slug']
-            clause = player['buyoutClause']
-            clause_tt = player['buyoutClauseLockedEndTime']
-            points = player['playerMaster']['points']
-            last_stats = player['playerMaster']['lastStats']
-            matches = 0
-            for stat in last_stats:
-                if stat['stats']['mins_played'][0] > 0:
-                    matches += 1
-            average = round(points * 100 / matches) if matches > 0 else 0
-            print(name, points, matches, average)
-            percent_change_3d = self.get_market_variation_3d(player_id)
-            players.append((player_id, name, team, position, status, value, percent_change_3d,
-                            clause, clause_tt, points, matches, average))
-        return team_dict, players
+    def get_teams(self):
+        teams = []
+        for team_id in self.config.get("teams"):
+            response = requests.get(self.config.get("team_url") % team_id, headers=self.headers)
+            if response.status_code != 200:
+                self.logger.error('Get team %s - Error: %s' % (response.status_code, response.reason))
+                return
+            response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
+            self.logger.info('Get team %s - Ok' % response.status_code)
+            manager = response_dict['manager']['managerName']
+            team_money = response_dict['teamMoney']
+            team_value = response_dict['teamValue']
+            team_points = response_dict['teamPoints']
+            players = []
+            for player in response_dict['players']:
+                player_id = player['playerMaster']['id']
+                name = player['playerMaster']['nickname']
+                position = player['playerMaster']['positionId']
+                value = player['playerMaster']['marketValue']
+                status = player['playerMaster']['playerStatus']
+                team = player['playerMaster']['team']['slug']
+                clause = player['buyoutClause']
+                clause_tt = player['buyoutClauseLockedEndTime']
+                points = player['playerMaster']['points']
+                last_stats = player['playerMaster']['lastStats']
+                matches = 0
+                for stat in last_stats:
+                    if stat['stats']['mins_played'][0] > 0:
+                        matches += 1
+                average = round(points * 100 / matches) if matches > 0 else 0
+                percent_change_3d = self.get_market_variation_3d(player_id)
+                players.append((player_id, name, team, position, status, value, percent_change_3d,
+                                clause, clause_tt, points, matches, average))
+            teams.append({'id': team_id, 'manager': manager, 'money': team_money,
+                          'value': team_value, 'points': team_points, 'players': players})
+        return teams
 
 
 if __name__ == "__main__":
@@ -192,6 +194,4 @@ if __name__ == "__main__":
     # print(json.dumps(api_client.get_market_variation_3d('58')))
     # print(json.dumps(api_client.get_operations()))
     # print(json.dumps(api_client.get_players()))
-    # team_dict, players = api_client.get_team()
-    # print(json.dumps(team_dict))
-    # print(json.dumps(players))
+    # print(api_client.get_teams())

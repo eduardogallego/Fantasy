@@ -114,11 +114,17 @@ def team_json():
     return database.get_team()
 
 
+@app.route('/rivals.json', methods=['GET'])
+def rivals_json():
+    database = Database(config)
+    return database.get_rivals()
+
+
 @app.route('/update', methods=['GET'])
 def update():
     database = Database(config)
     database.update_operations()
-    database.update_team()
+    database.update_teams()
     database.update_market()
     database.update_players()
     return redirect("/team")

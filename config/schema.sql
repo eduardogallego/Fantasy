@@ -38,16 +38,24 @@ CREATE TABLE players (
   last_season_points INTEGER NOT NULL,
   seller TEXT);
 
-DROP TABLE IF EXISTS team;
-CREATE TABLE team (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  player_id TEXT NOT NULL,
-  name TEXT NOT NULL,
+DROP TABLE IF EXISTS managers;
+CREATE TABLE managers (
+  id TEXT PRIMARY KEY,
+  manager TEXT UNIQUE NOT NULL,
+  team_money INTEGER,
+  team_value INTEGER NOT NULL,
+  points INTEGER NOT NULL);
+
+DROP TABLE IF EXISTS teams;
+CREATE TABLE teams (
+  id TEXT PRIMARY KEY,
+  manager_id TEXT NOT NULL,
+  player TEXT NOT NULL,
   team TEXT NOT NULL,
   pos INTEGER NOT NULL,
   status TEXT NOT NULL,
-  buy_tt TIMESTAMP NOT NULL,
-  buy_value INTEGER NOT NULL,
+  buy_tt TIMESTAMP,
+  buy_value INTEGER,
   sale_value INTEGER NOT NULL,
   percent_change_3d INTEGER NOT NULL,
   clause_value INTEGER NOT NULL,
@@ -78,7 +86,3 @@ INSERT INTO operations (player_id, name, pos, buy_tt, buy_value) VALUES
 ("1447", "Stuani", "4", "2023-07-28T22:00:00+02:00", 7036099);
 
 INSERT INTO status (status_key, status_value) VALUES ("last_operation", "2023-07-28T00:00:00+02:00");
-INSERT INTO status (status_key, status_value) VALUES ("team_manager", NULL);
-INSERT INTO status (status_key, status_value) VALUES ("team_money", NULL);
-INSERT INTO status (status_key, status_value) VALUES ("team_value", NULL);
-INSERT INTO status (status_key, status_value) VALUES ("team_points", NULL);

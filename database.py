@@ -119,8 +119,45 @@ class Database:
 
     def get_team(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, team, pos, status, buy_value, sale_value, clause_value, clause_tt, "
-                       "percent_change_3d, points, matches, average FROM team ORDER BY pos ASC, average DESC")
+        cursor.execute(f'SELECT player, team, pos, status, buy_value, sale_value, clause_value, '
+                       f'clause_tt, percent_change_3d, points, matches, average FROM teams '
+                       f'WHERE manager_id == "{self.config.get("team_id")}" ORDER BY pos ASC, average DESC')
+        rows = cursor.fetchall()
+        result = []
+        value_list = []
+        for row in rows:
+            value_list.append(row[11])
+        list.sort(value_list, reverse=True)
+        for row in rows:
+            index = value_list.index(row[11]) + 1
+            buy_value = None if row[4] is None else '{0:.2f}'.format(round(row[4] / 1000000, 2))
+            benefit = None if row[4] is None else '{0:.2f}'.format(round((row[5] - row[4]) / 1000000, 2))
+            percent_ben = None if row[4] is None else round((row[5] - row[4]) * 100 / row[4])
+            clause_secs = round((datetime.fromisoformat(row[7]) - datetime.now(timezone.utc)).total_seconds())
+            clause = '{0:.2f}'.format(round(row[6] / 1000000, 2))
+            if clause_secs > 86400:
+                clause = f'{round(clause_secs / 86400)}d'
+            elif clause_secs > 3600:
+                clause = f'{round(clause_secs / 3600)}h'
+            elif clause_secs > 60:
+                clause = f'{round(clause_secs / 60)}m'
+            elif clause_secs > 0:
+                clause = f'{clause_secs}s'
+            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
+                           "buy_value": buy_value, "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
+                           "clause": clause, "benefit": benefit, "percent_ben": percent_ben,
+                           "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
+                           "percent_chg_3d": row[8], "points": row[9], "matches": row[10],
+                           "average": '{0:.2f}'.format(round(row[11] / 100, 2))})
+        return json.dumps(result)
+
+    def get_rivals(self):
+        cursor = self.connection.cursor()
+        cursor.execute(f'SELECT player, team, pos, status, managers.manager, sale_value, clause_value, clause_tt, '
+                       f'percent_change_3d, teams.points, matches, average '
+                       f'FROM teams INNER JOIN managers ON teams.manager_id = managers.id '
+                       f'WHERE manager_id != "{self.config.get("team_id")}" '
+                       f'ORDER BY managers.points DESC, managers.team_value DESC, pos ASC, average DESC')
         rows = cursor.fetchall()
         result = []
         value_list = []
@@ -139,20 +176,20 @@ class Database:
                 clause = f'{round(clause_secs / 60)}m'
             elif clause_secs > 0:
                 clause = f'{clause_secs}s'
-            result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
-                           "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
-                           "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)), "clause": clause,
-                           "benefit": '{0:.2f}'.format(round((row[5] - row[4]) / 1000000, 2)),
-                           "percent_ben": round((row[5] - row[4]) * 100 / row[4]),
-                           "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
+            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
+                           "manager": row[4], "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
+                           "clause": clause, "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
                            "percent_chg_3d": row[8], "points": row[9], "matches": row[10],
                            "average": '{0:.2f}'.format(round(row[11] / 100, 2))})
         return json.dumps(result)
 
     def get_team_status(self):
-        money = round(int(self.get_status('team_money')) / 1000000)
-        value = round(int(self.get_status('team_value')) / 1000000)
-        points = self.get_status('team_points')
+        cursor = self.connection.cursor()
+        cursor.execute(f'SELECT team_money, team_value, points FROM managers WHERE id = "{self.config.get("team_id")}"')
+        row = cursor.fetchone()
+        money = round(row[0] / 1000000)
+        value = round(row[1] / 1000000)
+        points = row[2]
         return money, value, points
 
     def update_market(self):
@@ -200,24 +237,31 @@ class Database:
     def update_status(self, cursor, key, value):
         cursor.execute(f"UPDATE status SET status_value = '{value}' where status_key = '{key}'")
 
-    def update_team(self):
+    def update_teams(self):
         cursor = self.connection.cursor()
-        team, players = self.api_client.get_team()
+        teams = self.api_client.get_teams()
+        managers_db = []
         players_db = []
-        for player in players:
-            cursor.execute(f"SELECT buy_tt, buy_value FROM operations "
-                           f"WHERE player_id = {player[0]} AND sale_tt IS NULL")
-            buy_prices = cursor.fetchone()
-            players_db.append((player[0], player[1], player[2], player[3], player[4], buy_prices[0], buy_prices[1],
-                               player[5], player[6], player[7], player[8], player[9], player[10], player[11]))
-        self.update_status(cursor, 'team_manager', team['team_manager'])
-        self.update_status(cursor, 'team_money', team['team_money'])
-        self.update_status(cursor, 'team_value', team['team_value'])
-        self.update_status(cursor, 'team_points', team['team_points'])
-        cursor.execute('DELETE FROM team')
-        cursor.executemany('INSERT INTO team(player_id,name,team,pos,status,buy_tt,buy_value,sale_value,'
+        for team in teams:
+            managers_db.append((team['id'], team['manager'], team['money'], team['value'], team['points']))
+            for player in team['players']:
+                buy_tt = None
+                buy_value = None
+                if team['id'] == self.config.get('team_id'):
+                    cursor.execute(f"SELECT buy_tt, buy_value FROM operations "
+                                   f"WHERE player_id = {player[0]} AND sale_tt IS NULL")
+                    buy_prices = cursor.fetchone()
+                    buy_tt = buy_prices[0]
+                    buy_value = buy_prices[1]
+                players_db.append((player[0], team['id'], player[1], player[2], player[3], player[4], buy_tt, buy_value,
+                                   player[5], player[6], player[7], player[8], player[9], player[10], player[11]))
+        cursor.execute('DELETE FROM managers')
+        cursor.executemany('INSERT INTO managers(id,manager,team_money,team_value,points) VALUES(?,?,?,?,?)',
+                           managers_db)
+        cursor.execute('DELETE FROM teams')
+        cursor.executemany('INSERT INTO teams(id,manager_id,player,team,pos,status,buy_tt,buy_value,sale_value,'
                            'percent_change_3d,clause_value,clause_tt,points,matches,average) '
-                           'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)', players_db)
+                           'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', players_db)
         self.connection.commit()
 
 
@@ -226,8 +270,10 @@ if __name__ == "__main__":
     database = Database(configuration)
     # database.update_operations()
     # print(json.dumps(database.get_operations()))
-    # database.update_team()
+    # database.update_teams()
+    print(json.dumps(database.get_team_status()))
     # print(json.dumps(database.get_team()))
+    # print(json.dumps(database.get_rivals()))
     # database.update_market()
     # print(json.dumps(database.get_market()))
     # database.update_players()
