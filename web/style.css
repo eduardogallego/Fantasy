@@ -179,6 +179,10 @@ html {
     color: black;
 }
 
+.scale-N {
+    background-color: red !important;
+    color: white !important;
+}
 .scale-0 {
     background-color: rgb(128,128,128) !important;
     color: white !important;

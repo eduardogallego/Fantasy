@@ -1,8 +1,21 @@
 
 function cellStyleValue(value, row, index) {
-    var scale = Math.min(Math.floor(value / 10), 9);
     return {
-        classes: 'right scale-' + scale
+        classes: 'right scale-' + Math.min(Math.floor(value / 10), 9)
+    }
+}
+
+function cellStylePoints(value, row, index) {
+    extra = ''
+    if (value !== null) {
+        if (value < 0) {
+            extra = ' scale-N';
+        } else {
+            extra = ' scale-' + Math.min(value, 9);
+        }
+    }
+    return {
+        classes: 'right' + extra
     }
 }
 
