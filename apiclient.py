@@ -97,11 +97,11 @@ class ApiClient:
         response = requests.get(self.config.get("market_value_url") % player_id, headers=self.headers)
         time.sleep(0.2)
         if response.status_code != 200:
-            self.logger.error('Get player %s marked value %s - Error: %s'
+            self.logger.error('Get market variation 3d %s %s - Error: %s'
                               % (player_id, response.status_code, response.reason))
             return
         response_list = json.loads(response.text.encode().decode('utf-8-sig'))
-        self.logger.info('Get player %s marked value %s - Ok' % (player_id, response.status_code))
+        self.logger.info('Get market variation 3d %s %s - Ok' % (player_id, response.status_code))
         history_size = min(len(response_list), 3)
         end_value = response_list[len(response_list) - 1]['marketValue']
         ini_value = response_list[len(response_list) - history_size - 1]['marketValue']
@@ -149,15 +149,35 @@ class ApiClient:
             players.append((name, team, position, status, value, points, average_points, last_season_points, seller))
         return players
 
+    def get_points(self, week):
+        response = requests.get(self.config.get("points_url") % week, headers=self.headers)
+        if response.status_code != 200:
+            self.logger.error('Get points %s - Error: %s' % (response.status_code, response.reason))
+            return
+        response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
+        self.logger.info('Get points %s - Ok' % response.status_code)
+        players = [response_dict['formation']['goalkeeper'][0]['playerMaster']]
+        for defender in response_dict['formation']['defender']:
+            players.append(defender['playerMaster'])
+        for midfield in response_dict['formation']['midfield']:
+            players.append(midfield['playerMaster'])
+        for striker in response_dict['formation']['striker']:
+            players.append(striker['playerMaster'])
+        points = []
+        for player in players:
+            points.append((player['id'], player['nickname'], player['team']['slug'], player['positionId'],
+                           player['weekPoints'] if 'weekPoints' in player else None))
+        return points
+
     def get_teams(self):
         teams = []
         for team_id in self.config.get("teams"):
             response = requests.get(self.config.get("team_url") % team_id, headers=self.headers)
             if response.status_code != 200:
-                self.logger.error('Get team %s - Error: %s' % (response.status_code, response.reason))
+                self.logger.error('Get teams %s - Error: %s' % (response.status_code, response.reason))
                 return
             response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
-            self.logger.info('Get team %s - Ok' % response.status_code)
+            self.logger.info('Get teams %s - Ok' % response.status_code)
             manager = response_dict['manager']['managerName']
             team_money = response_dict['teamMoney']
             team_value = response_dict['teamValue']
@@ -195,3 +215,4 @@ if __name__ == "__main__":
     # print(json.dumps(api_client.get_operations()))
     # print(json.dumps(api_client.get_players()))
     # print(api_client.get_teams())
+    print(api_client.get_points(1))

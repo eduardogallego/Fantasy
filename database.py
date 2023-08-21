@@ -112,6 +112,23 @@ class Database:
                            "percent": round((row[5] - row[3]) * 100 / row[3], 0)})
         return json.dumps(result)
 
+    def get_points(self):
+        cursor = self.connection.cursor()
+        cursor.execute('SELECT player, team, pos, '
+                       '(coalesce(j1,0) + coalesce(j2,0) + coalesce(j3,0) + coalesce(j4,0) + coalesce(j5,0)) as total, '
+                       'j1, j2, j3, j4, j5 FROM points ORDER BY total DESC, pos ASC')
+        rows = cursor.fetchall()
+        result = []
+        total_list = []
+        for row in rows:
+            total_list.append(row[3])
+        list.sort(total_list, reverse=True)
+        for row in rows:
+            index = total_list.index(row[3]) + 1
+            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2],
+                           "total": row[3], "j1": row[4], "j2": row[5], "j3": row[6]})
+        return json.dumps(result)
+
     def get_status(self, key):
         cursor = self.connection.cursor()
         cursor.execute(f"SELECT status_value FROM status WHERE status_key = '{key}'")
@@ -234,6 +251,17 @@ class Database:
                            'last_season_points, seller) VALUES(?,?,?,?,?,?,?,?,?)', players)
         self.connection.commit()
 
+    def update_points(self):
+        cursor = self.connection.cursor()
+        cursor.execute('DELETE FROM points')
+        for i in range(1, 3):
+            points = self.api_client.get_points(i)
+            cursor.executemany(f'INSERT OR IGNORE INTO points(id, player, team, pos, j{i}) VALUES(?,?,?,?,?)', points)
+            for player in points:
+                if player[4] is not None:
+                    cursor.execute(f"UPDATE points SET j{i} = {player[4]} WHERE id = '{player[0]}'")
+        self.connection.commit()
+
     def update_status(self, cursor, key, value):
         cursor.execute(f"UPDATE status SET status_value = '{value}' where status_key = '{key}'")
 
@@ -271,7 +299,7 @@ if __name__ == "__main__":
     # database.update_operations()
     # print(json.dumps(database.get_operations()))
     # database.update_teams()
-    print(json.dumps(database.get_team_status()))
+    # print(json.dumps(database.get_team_status()))
     # print(json.dumps(database.get_team()))
     # print(json.dumps(database.get_rivals()))
     # database.update_market()
@@ -279,3 +307,6 @@ if __name__ == "__main__":
     # database.update_players()
     # print(json.dumps(database.get_players()))
     # print(json.dumps(database.get_players_top()))
+    database.update_points()
+    print(json.dumps(database.get_points()))
+

@@ -100,6 +100,20 @@ def operations_json():
     return database.get_operations()
 
 
+@app.route('/points', methods=['GET'])
+@login_required
+def points():
+    database = Database(config)
+    money, value, team_points = database.get_team_status()
+    return render_template("points.html", points=team_points, cash=money, team=value, total=(money + value))
+
+
+@app.route('/points.json', methods=['GET'])
+def points_json():
+    database = Database(config)
+    return database.get_points()
+
+
 @app.route('/team', methods=['GET'])
 @login_required
 def team():
@@ -127,6 +141,7 @@ def update():
     database.update_teams()
     database.update_market()
     database.update_players()
+    database.update_points()
     return redirect("/team")
 
 

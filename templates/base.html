@@ -217,6 +217,46 @@
                 return total;
             }
 
+            function footTotalFormatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    if (data.total != null) {
+                        total = total + data.total;
+                    }
+                });
+                return total;
+            }
+
+            function footJ1Formatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    if (data.j1 != null) {
+                        total = total + data.j1;
+                    }
+                });
+                return total;
+            }
+
+            function footJ2Formatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    if (data.j2 != null) {
+                        total = total + data.j2;
+                    }
+                });
+                return total;
+            }
+
+            function footJ3Formatter(data) {
+                var total = 0;
+                data.forEach(function(data) {
+                    if (data.j3 != null) {
+                        total = total + data.j3;
+                    }
+                });
+                return total;
+            }
+
             function cellStyleValue(value, row, index) {
                 var scale = Math.min(Math.floor(value / 10), 9);
                 return {
@@ -280,6 +320,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/players">Players</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/points">Points</a>
                         </li>
                     </ul>
                     <table class="d-flex right">
