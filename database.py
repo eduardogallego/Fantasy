@@ -115,8 +115,17 @@ class Database:
     def get_points(self):
         cursor = self.connection.cursor()
         cursor.execute('SELECT player, team, pos, '
-                       '(coalesce(j1,0) + coalesce(j2,0) + coalesce(j3,0) + coalesce(j4,0) + coalesce(j5,0)) as total, '
-                       'j1, j2, j3, j4, j5 FROM points ORDER BY total DESC, pos ASC')
+                       '(coalesce(j1,0) + coalesce(j2,0) + coalesce(j3,0) + coalesce(j4,0) + coalesce(j5,0) '
+                       '+ coalesce(j6,0) + coalesce(j7,0) + coalesce(j8,0) + coalesce(j9,0) + coalesce(j10,0) '
+                       '+ coalesce(j11,0) + coalesce(j12,0) + coalesce(j13,0) + coalesce(j14,0) + coalesce(j15,0) '
+                       '+ coalesce(j16,0) + coalesce(j17,0) + coalesce(j18,0) + coalesce(j19,0) + coalesce(j20,0) '
+                       '+ coalesce(j21,0) + coalesce(j22,0) + coalesce(j23,0) + coalesce(j24,0) + coalesce(j25,0) '
+                       '+ coalesce(j26,0) + coalesce(j27,0) + coalesce(j28,0) + coalesce(j29,0) + coalesce(j30,0) '
+                       '+ coalesce(j31,0) + coalesce(j32,0) + coalesce(j33,0) + coalesce(j34,0) + coalesce(j35,0) '
+                       '+ coalesce(j36,0) + coalesce(j37,0) + coalesce(j38,0)) as total, '
+                       'j1, j2, j3, j4, j5, j6, j7, j8, j9, j10, j11, j12, j13, j14, j15, j16, j17, j18, j19, j20, '
+                       'j21, j22, j23, j24, j25, j26, j27, j28, j29, j30, j31, j32, j33, j34, j35, j36, j37, j38 '
+                       'FROM points ORDER BY total DESC, pos ASC')
         rows = cursor.fetchall()
         result = []
         total_list = []
@@ -125,8 +134,15 @@ class Database:
         list.sort(total_list, reverse=True)
         for row in rows:
             index = total_list.index(row[3]) + 1
-            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2],
-                           "total": row[3], "j1": row[4], "j2": row[5], "j3": row[6]})
+            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "total": row[3],
+                           "j1": row[4], "j2": row[5], "j3": row[6], "j4": row[7], "j5": row[8],
+                           "j6": row[9], "j7": row[10], "j8": row[11], "j9": row[12], "j10": row[13],
+                           "j11": row[14], "j12": row[15], "j13": row[16], "j14": row[17], "j15": row[18],
+                           "j16": row[19], "j17": row[20], "j18": row[21], "j19": row[22], "j20": row[23],
+                           "j21": row[24], "j22": row[25], "j23": row[26], "j24": row[27], "j25": row[28],
+                           "j26": row[29], "j27": row[30], "j28": row[31], "j29": row[32], "j30": row[33],
+                           "j31": row[34], "j32": row[35], "j33": row[36], "j34": row[37], "j35": row[38],
+                           "j36": row[39], "j37": row[40], "j38": row[41]})
         return json.dumps(result)
 
     def get_status(self, key):
