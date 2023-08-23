@@ -82,21 +82,6 @@ function ownerFormatter(value, row) {
     return '<span class="owner own-' + value + '">' + value + '</span>';
 }
 
-function statusFormatter(value, row) {
-    if (value === 'ok') {
-        return '';
-    } else if (value === 'doubtful') {
-        value = 'UNK';
-    } else if (value === 'injured') {
-        value = 'INJ';
-    } else if (value === 'out_of_league') {
-        value = 'OUT';
-    } else if (value === 'suspended') {
-        value = 'SUS';
-    }
-    return '<span class="status status-' + value + '">' + value + '</span>';
-}
-
 function playerFormatter(value, row) {
     var icons = '';
     if (row.tag != 0) {
@@ -112,17 +97,15 @@ function playerFormatter(value, row) {
     }
     var status = '';
     if (row.status != 'ok') {
-        status_value = ''
         if (row.status === 'doubtful') {
-            status_value = 'UNK';
+            status = ' <i class="bi bi-question-circle-fill"></i>';
         } else if (row.status === 'injured') {
-            status_value = 'INJ';
+            status = ' <i class="bi bi-bandaid-fill"></i>';
         } else if (row.status === 'out_of_league') {
-            status_value = 'OUT';
+            status = ' <i class="bi bi-forward-fill"></i>';
         } else if (row.status === 'suspended') {
-            status_value = 'SUS';
+            status = ' <i class="bi bi-file-fill"></i>';
         }
-        status = '<span class="status status-' + status_value + '">' + status_value + '</span>';
     }
     return icons + value + status
 }

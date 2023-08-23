@@ -35,11 +35,11 @@ class Database:
         list.sort(value_list, reverse=True)
         for row in rows:
             index = value_list.index(row[4]) + 1
-            result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
+            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
                            "percent_chg_3d": row[5], "points": row[6], "average": row[7], "bids": row[8],
                            "myBid": '{0:.2f}'.format(round(row[9] / 1000000, 2)) if row[9] is not None else None,
-                           "seller": row[10]})
+                           "seller": row[10], "tag": 0})
         return json.dumps(result)
 
     def get_players(self):
@@ -51,9 +51,9 @@ class Database:
         index = 0
         for row in rows:
             index += 1
-            result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
+            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "points": row[5],
-                           "average": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
+                           "average": row[6], "lastSeasonPoints": row[7], "seller": row[8], "tag": 0})
         return json.dumps(result)
 
     def get_players_top(self):
@@ -61,33 +61,36 @@ class Database:
         cursor.execute("SELECT name, team, pos, status, sale_value, points, average_points, last_season_points, seller "
                        "FROM players ORDER BY points DESC, sale_value ASC")
         rows = cursor.fetchall()
-        result = []
-        goalkeepers = 0
-        defenders = 0
-        midfielders = 0
-        strikers = 0
-        index = 0
+        players = []
+        goalkeepers = defenders = midfielders = strikers = 0
         for row in rows:
             if row[3] != 'ok':
                 continue
-            if (row[2] == 1 and goalkeepers < 1) or (row[2] == 2 and defenders < 5 and (defenders + midfielders) < 9)\
-                    or (row[2] == 3 and midfielders < 5 and (midfielders + strikers) < 7
-                        and (defenders + midfielders) < 9) \
-                    or (row[2] == 4 and strikers < 3 and (midfielders + strikers) < 7):
-                index += 1
-                result.append({"index": index, "name": row[0], "team": row[1], "pos": row[2], "status": row[3],
-                               "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "points": row[5],
-                               "average": row[6], "lastSeasonPoints": row[7], "seller": row[8]})
-                if row[2] == 1:
-                    goalkeepers += 1
-                elif row[2] == 2:
-                    defenders += 1
-                elif row[2] == 3:
-                    midfielders += 1
-                elif row[2] == 4:
-                    strikers += 1
-                if len(result) == 11:
-                    break
+            elif row[2] == 1 and goalkeepers == 0:
+                goalkeepers += 1
+                players.append(row + (goalkeepers + defenders + midfielders + strikers,))
+            elif row[2] == 2 and defenders < 5 and (defenders + midfielders) < 9 and (defenders + strikers) < 7 \
+                    and (defenders + midfielders + strikers) < 10:
+                defenders += 1
+                players.append(row + (goalkeepers + defenders + midfielders + strikers,))
+            elif row[2] == 3 and midfielders < 5 and (defenders + midfielders) < 9 and (midfielders + strikers) < 7 \
+                    and (defenders + midfielders + strikers) < 10:
+                midfielders += 1
+                players.append(row + (goalkeepers + defenders + midfielders + strikers,))
+            elif row[2] == 4 and strikers < 3 and (defenders + strikers) < 7 and (midfielders + strikers) < 7 \
+                    and (defenders + midfielders + strikers) < 10:
+                strikers += 1
+                players.append(row + (goalkeepers + defenders + midfielders + strikers,))
+            if len(players) == 11:
+                break
+        result = []
+        index = 0
+        for player in players:
+            index += 1
+            result.append({"index": index, "player": player[0], "team": player[1], "pos": player[2],
+                           "status": player[3], "sale_value": '{0:.2f}'.format(round(player[4] / 1000000, 2)),
+                           "points": player[5], "average": player[6], "lastSeasonPoints": player[7],
+                           "seller": player[8], "tag": player[9]})
         return json.dumps(result)
 
     def get_operations(self):
@@ -342,7 +345,7 @@ if __name__ == "__main__":
     database = Database(configuration)
     # database.update_operations()
     # print(json.dumps(database.get_operations()))
-    database.update_teams()
+    # database.update_teams()
     # print(json.dumps(database.get_team_status()))
     # print(json.dumps(database.get_team()))
     # print(json.dumps(database.get_rivals()))

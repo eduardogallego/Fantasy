@@ -38,6 +38,18 @@ html {
 .bi-star-fill.others {
     color: PowderBlue;
 }
+.bi-question-circle-fill {
+    color: orange;
+}
+.bi-bandaid-fill {
+    color: red;
+}
+.bi-forward-circle-fill {
+    color: black;
+}
+.bi-file-fill {
+    color: red;
+}
 
 .team-details {
     font-size: 0.8em;
@@ -123,33 +135,6 @@ html {
 .team-VAL {
     background-color: white;
     border: 1px solid grey;
-    color: black;
-}
-
-.status {
-    background-color: grey;
-    color: white;
-    display: inline-block;
-    font-size: 0.8em;
-    height: 20px;
-    text-align: center;
-    width: 30px;
-}
-.status-INJ {
-    background-color: orange;
-    border: 1px solid orange;
-}
-.status-OUT {
-    background-color: black;
-    border: 1px solid black;
-}
-.status-SUS {
-    background-color: red;
-    border: 1px solid red;
-}
-.status-UNK {
-    background-color: yellow;
-    border: 1px solid yellow;
     color: black;
 }
 
