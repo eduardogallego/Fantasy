@@ -153,7 +153,7 @@ class Database:
     def get_team(self):
         cursor = self.connection.cursor()
         cursor.execute(f'SELECT player, team, pos, status, buy_value, sale_value, clause_value, '
-                       f'clause_tt, percent_change_3d, points, matches, average FROM teams '
+                       f'clause_tt, percent_change_3d, points, matches, average, tag FROM teams '
                        f'WHERE manager_id == "{self.config.get("team_id")}" ORDER BY pos ASC, average DESC')
         rows = cursor.fetchall()
         result = []
@@ -181,13 +181,13 @@ class Database:
                            "clause": clause, "benefit": benefit, "percent_ben": percent_ben,
                            "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
                            "percent_chg_3d": row[8], "points": row[9], "matches": row[10],
-                           "average": '{0:.2f}'.format(round(row[11] / 100, 2))})
+                           "average": '{0:.2f}'.format(round(row[11] / 100, 2)), "tag": row[12]})
         return json.dumps(result)
 
     def get_rivals(self):
         cursor = self.connection.cursor()
         cursor.execute(f'SELECT player, team, pos, status, managers.manager, sale_value, clause_value, clause_tt, '
-                       f'percent_change_3d, teams.points, matches, average '
+                       f'percent_change_3d, teams.points, matches, average, tag '
                        f'FROM teams INNER JOIN managers ON teams.manager_id = managers.id '
                        f'WHERE manager_id != "{self.config.get("team_id")}" '
                        f'ORDER BY managers.points DESC, managers.team_value DESC, pos ASC, average DESC')
@@ -213,7 +213,7 @@ class Database:
                            "manager": row[4], "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
                            "clause": clause, "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
                            "percent_chg_3d": row[8], "points": row[9], "matches": row[10],
-                           "average": '{0:.2f}'.format(round(row[11] / 100, 2))})
+                           "average": '{0:.2f}'.format(round(row[11] / 100, 2)), "tag": row[12]})
         return json.dumps(result)
 
     def get_team_status(self):
@@ -281,6 +281,31 @@ class Database:
     def update_status(self, cursor, key, value):
         cursor.execute(f"UPDATE status SET status_value = '{value}' where status_key = '{key}'")
 
+    def tag_top_players(self, players):
+        # 4 pos, 8 sell value, 12 average
+        sorted_players = sorted(sorted(players, key=lambda x: x[8]), key=lambda x: x[12], reverse=True)
+        result = []
+        goalkeepers = defenders = midfielders = strikers = 0
+        for player in sorted_players:
+            if player[4] == 1 and goalkeepers == 0:
+                goalkeepers += 1
+                result.append(player + (goalkeepers + defenders + midfielders + strikers,))
+            elif player[4] == 2 and defenders < 5 and (defenders + midfielders) < 9 and (defenders + strikers) < 7 \
+                    and (defenders + midfielders + strikers) < 10:
+                defenders += 1
+                result.append(player + (goalkeepers + defenders + midfielders + strikers,))
+            elif player[4] == 3 and midfielders < 5 and (defenders + midfielders) < 9 and (midfielders + strikers) < 7 \
+                     and (defenders + midfielders + strikers) < 10:
+                midfielders += 1
+                result.append(player + (goalkeepers + defenders + midfielders + strikers,))
+            elif player[4] == 4 and strikers < 3 and (defenders + strikers) < 7 and (midfielders + strikers) < 7 \
+                     and (defenders + midfielders + strikers) < 10:
+                strikers += 1
+                result.append(player + (goalkeepers + defenders + midfielders + strikers,))
+            else:
+                result.append(player + (0,))
+        return result
+
     def update_teams(self):
         cursor = self.connection.cursor()
         teams = self.api_client.get_teams()
@@ -288,6 +313,7 @@ class Database:
         players_db = []
         for team in teams:
             managers_db.append((team['id'], team['manager'], team['money'], team['value'], team['points']))
+            team_players_db = []
             for player in team['players']:
                 buy_tt = None
                 buy_value = None
@@ -297,15 +323,17 @@ class Database:
                     buy_prices = cursor.fetchone()
                     buy_tt = buy_prices[0]
                     buy_value = buy_prices[1]
-                players_db.append((player[0], team['id'], player[1], player[2], player[3], player[4], buy_tt, buy_value,
-                                   player[5], player[6], player[7], player[8], player[9], player[10], player[11]))
+                team_players_db.append((player[0], team['id'], player[1], player[2], player[3],
+                                        player[4], buy_tt, buy_value, player[5], player[6],
+                                        player[7], player[8], player[9], player[10], player[11]))
+            players_db.extend(self.tag_top_players(team_players_db))
         cursor.execute('DELETE FROM managers')
         cursor.executemany('INSERT INTO managers(id,manager,team_money,team_value,points) VALUES(?,?,?,?,?)',
                            managers_db)
         cursor.execute('DELETE FROM teams')
         cursor.executemany('INSERT INTO teams(id,manager_id,player,team,pos,status,buy_tt,buy_value,sale_value,'
-                           'percent_change_3d,clause_value,clause_tt,points,matches,average) '
-                           'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', players_db)
+                           'percent_change_3d,clause_value,clause_tt,points,matches,average,tag) '
+                           'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', players_db)
         self.connection.commit()
 
 
@@ -314,7 +342,7 @@ if __name__ == "__main__":
     database = Database(configuration)
     # database.update_operations()
     # print(json.dumps(database.get_operations()))
-    # database.update_teams()
+    database.update_teams()
     # print(json.dumps(database.get_team_status()))
     # print(json.dumps(database.get_team()))
     # print(json.dumps(database.get_rivals()))
@@ -323,6 +351,6 @@ if __name__ == "__main__":
     # database.update_players()
     # print(json.dumps(database.get_players()))
     # print(json.dumps(database.get_players_top()))
-    database.update_points()
-    print(json.dumps(database.get_points()))
+    # database.update_points()
+    # print(json.dumps(database.get_points()))
 

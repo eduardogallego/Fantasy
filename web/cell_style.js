@@ -11,7 +11,7 @@ function cellStylePoints(value, row, index) {
         if (value < 0) {
             extra = ' scale-N';
         } else {
-            extra = ' scale-' + Math.min(value, 9);
+            extra = ' scale-' + Math.min(Math.round(value), 9);
         }
     }
     return {
@@ -19,7 +19,7 @@ function cellStylePoints(value, row, index) {
     }
 }
 
-function clauseStyleValue(value, row, index) {
+function cellStyleClause(value, row, index) {
     if (value === '1d' || value === '2d') {
         return {
             classes: 'right warning'

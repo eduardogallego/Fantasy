@@ -26,6 +26,19 @@ html {
     text-align: right;
 }
 
+.bi-star-fill.gold {
+    color: gold;
+}
+.bi-star-fill.silver {
+    color: silver;
+}
+.bi-star-fill.bronze {
+    color: maroon;
+}
+.bi-star-fill.others {
+    color: PowderBlue;
+}
+
 .team-details {
     font-size: 0.8em;
     line-height: 1;

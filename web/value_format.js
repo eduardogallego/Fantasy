@@ -83,17 +83,46 @@ function ownerFormatter(value, row) {
 }
 
 function statusFormatter(value, row) {
-    var status = value;
     if (value === 'ok') {
         return '';
     } else if (value === 'doubtful') {
-        status = 'UNK';
+        value = 'UNK';
     } else if (value === 'injured') {
-        status = 'INJ';
+        value = 'INJ';
     } else if (value === 'out_of_league') {
-        status = 'OUT';
+        value = 'OUT';
     } else if (value === 'suspended') {
-        status = 'SUS';
+        value = 'SUS';
     }
-    return '<span class="status status-' + status + '">' + status + '</span>';
+    return '<span class="status status-' + value + '">' + value + '</span>';
+}
+
+function playerFormatter(value, row) {
+    var icons = '';
+    if (row.tag != 0) {
+        var color = 'others';
+        if (row.tag == 1) {
+            color = 'gold';
+        } else if (row.tag == 2) {
+            color = 'silver'
+        } else if (row.tag == 3) {
+            color = 'bronze'
+        }
+        icons = '<i class="bi bi-star-fill ' + color + '"></i> ';
+    }
+    var status = '';
+    if (row.status != 'ok') {
+        status_value = ''
+        if (row.status === 'doubtful') {
+            status_value = 'UNK';
+        } else if (row.status === 'injured') {
+            status_value = 'INJ';
+        } else if (row.status === 'out_of_league') {
+            status_value = 'OUT';
+        } else if (row.status === 'suspended') {
+            status_value = 'SUS';
+        }
+        status = '<span class="status status-' + status_value + '">' + status_value + '</span>';
+    }
+    return icons + value + status
 }
