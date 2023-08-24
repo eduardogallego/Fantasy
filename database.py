@@ -285,12 +285,14 @@ class Database:
         cursor.execute(f"UPDATE status SET status_value = '{value}' where status_key = '{key}'")
 
     def tag_top_players(self, players):
-        # 4 pos, 8 sell value, 12 average
+        # 4 pos, 5 status, 8 sell value, 12 average
         sorted_players = sorted(sorted(players, key=lambda x: x[8]), key=lambda x: x[12], reverse=True)
         result = []
         goalkeepers = defenders = midfielders = strikers = 0
         for player in sorted_players:
-            if player[4] == 1 and goalkeepers == 0:
+            if player[5] != 'ok':
+                result.append(player + (0,))
+            elif player[4] == 1 and goalkeepers == 0:
                 goalkeepers += 1
                 result.append(player + (goalkeepers + defenders + midfielders + strikers,))
             elif player[4] == 2 and defenders < 5 and (defenders + midfielders) < 9 and (defenders + strikers) < 7 \
