@@ -135,8 +135,25 @@ class Database:
         for row in rows:
             total_list.append(row[3])
         list.sort(total_list, reverse=True)
+        goalkeepers = defenders = midfielders = strikers = 0
         for row in rows:
             index = total_list.index(row[3]) + 1
+            tag = 0
+            if row[2] == 1 and goalkeepers == 0:
+                goalkeepers += 1
+                tag = goalkeepers + defenders + midfielders + strikers
+            elif row[2] == 2 and defenders < 5 and (defenders + midfielders) < 9 and (defenders + strikers) < 7 \
+                    and (defenders + midfielders + strikers) < 10:
+                defenders += 1
+                tag = goalkeepers + defenders + midfielders + strikers
+            elif row[2] == 3 and midfielders < 5 and (defenders + midfielders) < 9 and (midfielders + strikers) < 7 \
+                    and (defenders + midfielders + strikers) < 10:
+                midfielders += 1
+                tag = goalkeepers + defenders + midfielders + strikers
+            elif row[2] == 4 and strikers < 3 and (defenders + strikers) < 7 and (midfielders + strikers) < 7 \
+                    and (defenders + midfielders + strikers) < 10:
+                strikers += 1
+                tag = goalkeepers + defenders + midfielders + strikers
             result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "total": row[3],
                            "j1": row[4], "j2": row[5], "j3": row[6], "j4": row[7], "j5": row[8],
                            "j6": row[9], "j7": row[10], "j8": row[11], "j9": row[12], "j10": row[13],
@@ -145,7 +162,7 @@ class Database:
                            "j21": row[24], "j22": row[25], "j23": row[26], "j24": row[27], "j25": row[28],
                            "j26": row[29], "j27": row[30], "j28": row[31], "j29": row[32], "j30": row[33],
                            "j31": row[34], "j32": row[35], "j33": row[36], "j34": row[37], "j35": row[38],
-                           "j36": row[39], "j37": row[40], "j38": row[41]})
+                           "j36": row[39], "j37": row[40], "j38": row[41], "tag": tag})
         return json.dumps(result)
 
     def get_status(self, key):
