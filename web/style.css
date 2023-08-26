@@ -1,5 +1,5 @@
 html {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .table-borderless > tbody > tr > td,
@@ -17,6 +17,7 @@ html {
     text-align: right;
     width: 50px;
 }
+
 .tag {
     text-align: center;
     width: 32px;
@@ -60,7 +61,7 @@ html {
     color: white;
     display: inline-block;
     font-size: 0.8em;
-    height: 20px;
+    height: 17px;
     text-align: center;
     width: 30px;
 }
@@ -86,7 +87,7 @@ html {
     color: white;
     display: inline-block;
     font-size: 0.8em;
-    height: 20px;
+    height: 17px;
     text-align: center;
     width: 30px;
 }
@@ -143,7 +144,7 @@ html {
     color: white;
     display: inline-block;
     font-size: 0.8em;
-    height: 20px;
+    height: 17px;
     text-align: center;
     width: 30px;
 }
@@ -226,4 +227,7 @@ html {
 .error {
     background-color: red !important;
     color: white !important;
+}
+.inactive {
+    background-color: LightGray !important;
 }

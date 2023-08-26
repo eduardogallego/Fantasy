@@ -19,7 +19,7 @@ api_client = ApiClient(config)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "/login"
-user = User(config.get('user_id'), config.get('user_name'), config.get('user_password'))
+user = User(config.get('team_id'), config.get('user_name'), config.get('user_password'))
 
 
 @login_manager.user_loader

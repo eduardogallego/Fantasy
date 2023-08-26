@@ -5,6 +5,26 @@ function cellStyleValue(value, row, index) {
     }
 }
 
+function cellStyleInactive(value, row, index) {
+    active = '';
+    if (!row.active) {
+        inactive = 'inactive';
+    }
+    return {
+        classes: inactive
+    }
+}
+
+function cellStyleIndexInactive(value, row, index) {
+    inactive = '';
+    if (!row.active) {
+        inactive = ' inactive';
+    }
+    return {
+        classes: 'index' + inactive
+    }
+}
+
 function cellStylePoints(value, row, index) {
     extra = ''
     if (value !== null) {

@@ -192,16 +192,29 @@ class ApiClient:
                 team = player['playerMaster']['team']['slug']
                 clause = player['buyoutClause']
                 clause_tt = player['buyoutClauseLockedEndTime']
-                points = player['playerMaster']['points']
+                total_points = player['playerMaster']['points']
                 last_stats = player['playerMaster']['lastStats']
-                matches = 0
+                played_matches = 0
+                non_peak_matches_points = []
+                last_5_matches_points = []
                 for stat in last_stats:
                     if stat['stats']['mins_played'][0] > 0:
-                        matches += 1
-                average = round(points * 100 / matches) if matches > 0 else 0
+                        played_matches += 1
+                        non_peak_matches_points.append(stat['totalPoints'])
+                    last_5_matches_points.append(stat['totalPoints'])
+                points_per_match = round(total_points * 100 / played_matches) if played_matches > 0 else 0
+                peaks = int((played_matches + 2) / 5)
+                non_peak_matches_points.sort()
+                non_peak_matches_points = non_peak_matches_points[peaks: len(non_peak_matches_points) - peaks]
+                non_peak_matches_mean = round(sum(non_peak_matches_points) * 100 / len(non_peak_matches_points)) \
+                    if played_matches > 0 else 0
+                last_5_matches_points = last_5_matches_points[-5:]
+                last_5_matches_mean = round(sum(last_5_matches_points) * 100 / len(last_5_matches_points)) \
+                    if played_matches > 0 else 0
+                average = round((points_per_match + last_5_matches_mean + non_peak_matches_mean) / 3)
                 percent_change_3d = self.get_market_variation_3d(player_id)
                 players.append((player_id, name, team, position, status, value, percent_change_3d,
-                                clause, clause_tt, points, matches, average))
+                                clause, clause_tt, total_points, played_matches, average))
             teams.append({'id': team_id, 'manager': manager, 'money': team_money,
                           'value': team_value, 'points': team_points, 'players': players})
         return teams
@@ -215,4 +228,4 @@ if __name__ == "__main__":
     # print(json.dumps(api_client.get_operations()))
     # print(json.dumps(api_client.get_players()))
     # print(api_client.get_teams())
-    print(api_client.get_points(1))
+    # print(api_client.get_points(1))

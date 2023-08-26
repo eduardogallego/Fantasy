@@ -36,8 +36,8 @@ class Database:
         for row in rows:
             index = value_list.index(row[4]) + 1
             result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
-                           "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
-                           "percent_chg_3d": row[5], "points": row[6], "average": row[7], "bids": row[8],
+                           "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "percent_chg_3d": row[5],
+                           "points": row[6], "average": '{0:.2f}'.format(round(row[7], 2)), "bids": row[8],
                            "myBid": '{0:.2f}'.format(round(row[9] / 1000000, 2)) if row[9] is not None else None,
                            "seller": row[10], "tag": 0})
         return json.dumps(result)
@@ -52,8 +52,9 @@ class Database:
         for row in rows:
             index += 1
             result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
-                           "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "points": row[5],
-                           "average": row[6], "lastSeasonPoints": row[7], "seller": row[8], "tag": 0})
+                           "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
+                           "points": row[5], "average": '{0:.2f}'.format(round(row[6], 2)),
+                           "lastSeasonPoints": row[7], "seller": row[8], "tag": 0})
         return json.dumps(result)
 
     def get_players_top(self):
@@ -89,8 +90,8 @@ class Database:
             index += 1
             result.append({"index": index, "player": player[0], "team": player[1], "pos": player[2],
                            "status": player[3], "sale_value": '{0:.2f}'.format(round(player[4] / 1000000, 2)),
-                           "points": player[5], "average": player[6], "lastSeasonPoints": player[7],
-                           "seller": player[8], "tag": player[9]})
+                           "points": player[5], "average": '{0:.2f}'.format(round(player[6], 2)),
+                           "lastSeasonPoints": player[7], "seller": player[8], "tag": player[9]})
         return json.dumps(result)
 
     def get_operations(self):
@@ -117,7 +118,7 @@ class Database:
 
     def get_points(self):
         cursor = self.connection.cursor()
-        cursor.execute('SELECT player, team, pos, '
+        cursor.execute('SELECT points.player, points.team, points.pos, manager_id,'
                        '(coalesce(j1,0) + coalesce(j2,0) + coalesce(j3,0) + coalesce(j4,0) + coalesce(j5,0) '
                        '+ coalesce(j6,0) + coalesce(j7,0) + coalesce(j8,0) + coalesce(j9,0) + coalesce(j10,0) '
                        '+ coalesce(j11,0) + coalesce(j12,0) + coalesce(j13,0) + coalesce(j14,0) + coalesce(j15,0) '
@@ -128,16 +129,17 @@ class Database:
                        '+ coalesce(j36,0) + coalesce(j37,0) + coalesce(j38,0)) as total, '
                        'j1, j2, j3, j4, j5, j6, j7, j8, j9, j10, j11, j12, j13, j14, j15, j16, j17, j18, j19, j20, '
                        'j21, j22, j23, j24, j25, j26, j27, j28, j29, j30, j31, j32, j33, j34, j35, j36, j37, j38 '
-                       'FROM points ORDER BY total DESC, pos ASC')
+                       'FROM points LEFT JOIN teams ON points.id = teams.id '
+                       'ORDER BY total DESC, points.pos ASC')
         rows = cursor.fetchall()
         result = []
         total_list = []
         for row in rows:
-            total_list.append(row[3])
+            total_list.append(row[4])
         list.sort(total_list, reverse=True)
         goalkeepers = defenders = midfielders = strikers = 0
         for row in rows:
-            index = total_list.index(row[3]) + 1
+            index = total_list.index(row[4]) + 1
             tag = 0
             if row[2] == 1 and goalkeepers == 0:
                 goalkeepers += 1
@@ -154,15 +156,16 @@ class Database:
                     and (defenders + midfielders + strikers) < 10:
                 strikers += 1
                 tag = goalkeepers + defenders + midfielders + strikers
-            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "total": row[3],
-                           "j1": row[4], "j2": row[5], "j3": row[6], "j4": row[7], "j5": row[8],
-                           "j6": row[9], "j7": row[10], "j8": row[11], "j9": row[12], "j10": row[13],
-                           "j11": row[14], "j12": row[15], "j13": row[16], "j14": row[17], "j15": row[18],
-                           "j16": row[19], "j17": row[20], "j18": row[21], "j19": row[22], "j20": row[23],
-                           "j21": row[24], "j22": row[25], "j23": row[26], "j24": row[27], "j25": row[28],
-                           "j26": row[29], "j27": row[30], "j28": row[31], "j29": row[32], "j30": row[33],
-                           "j31": row[34], "j32": row[35], "j33": row[36], "j34": row[37], "j35": row[38],
-                           "j36": row[39], "j37": row[40], "j38": row[41], "tag": tag})
+            active = row[3] is not None and row[3] == self.config.get('team_id')
+            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "total": row[4],
+                           "j1": row[5], "j2": row[6], "j3": row[7], "j4": row[8], "j5": row[9],
+                           "j6": row[10], "j7": row[11], "j8": row[12], "j9": row[13], "j10": row[14],
+                           "j11": row[15], "j12": row[16], "j13": row[17], "j14": row[18], "j15": row[19],
+                           "j16": row[20], "j17": row[21], "j18": row[22], "j19": row[23], "j20": row[24],
+                           "j21": row[25], "j22": row[26], "j23": row[27], "j24": row[28], "j25": row[29],
+                           "j26": row[30], "j27": row[31], "j28": row[32], "j29": row[33], "j30": row[34],
+                           "j31": row[35], "j32": row[36], "j33": row[37], "j34": row[38], "j35": row[39],
+                           "j36": row[40], "j37": row[41], "j38": row[42], "tag": tag, "active": active})
         return json.dumps(result)
 
     def get_status(self, key):
@@ -290,7 +293,7 @@ class Database:
     def update_points(self):
         cursor = self.connection.cursor()
         cursor.execute('DELETE FROM points')
-        for i in range(1, 3):
+        for i in range(1, 4):
             points = self.api_client.get_points(i)
             cursor.executemany(f'INSERT OR IGNORE INTO points(id, player, team, pos, j{i}) VALUES(?,?,?,?,?)', points)
             for player in points:
@@ -302,8 +305,8 @@ class Database:
         cursor.execute(f"UPDATE status SET status_value = '{value}' where status_key = '{key}'")
 
     def tag_top_players(self, players):
-        # 4 pos, 5 status, 8 sell value, 12 average
-        sorted_players = sorted(sorted(players, key=lambda x: x[8]), key=lambda x: x[12], reverse=True)
+        # 4 pos, 5 status, 8 sell value, 14 average
+        sorted_players = sorted(sorted(players, key=lambda x: x[8]), key=lambda x: x[14], reverse=True)
         result = []
         goalkeepers = defenders = midfielders = strikers = 0
         for player in sorted_players:
