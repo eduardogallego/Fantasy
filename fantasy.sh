@@ -55,7 +55,7 @@ case "$1" in
             update
             ;;
     *)
-            echo "Usage: $0 { start | stop | restart | status | status }"
+            echo "Usage: $0 { start | stop | restart | status | update }"
             exit 1
             ;;
 esac
