@@ -45,7 +45,7 @@ class Database:
     def get_players(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, team, pos, status, sale_value, points, average_points, last_season_points, seller "
-                       "FROM players ORDER BY points DESC, sale_value ASC")
+                       "FROM players ORDER BY average_points DESC, points DESC, sale_value ASC")
         rows = cursor.fetchall()
         result = []
         index = 0
@@ -60,7 +60,7 @@ class Database:
     def get_players_top(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, team, pos, status, sale_value, points, average_points, last_season_points, seller "
-                       "FROM players ORDER BY points DESC, sale_value ASC")
+                       "FROM players ORDER BY average_points DESC, points DESC, sale_value ASC")
         rows = cursor.fetchall()
         players = []
         goalkeepers = defenders = midfielders = strikers = 0
