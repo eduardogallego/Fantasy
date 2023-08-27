@@ -29,6 +29,11 @@ stop() {
   fi
 }
 
+update() {
+  git reset --hard
+  git pull origin master
+}
+
 case "$1" in
     'start')
             start
@@ -46,8 +51,11 @@ case "$1" in
     'status')
             status
             ;;
+    'update')
+            update
+            ;;
     *)
-            echo "Usage: $0 { start | stop | restart | status }"
+            echo "Usage: $0 { start | stop | restart | status | status }"
             exit 1
             ;;
 esac
