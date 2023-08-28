@@ -19,8 +19,7 @@ html {
 }
 
 .tag {
-    text-align: center;
-    width: 32px;
+    width: 20px;
 }
 .right {
     padding-right: 4px !important;
@@ -63,7 +62,7 @@ html {
     font-size: 0.8em;
     height: 17px;
     text-align: center;
-    width: 30px;
+    width: 20px;
 }
 .pos-1 {
     background-color: red;
@@ -89,7 +88,7 @@ html {
     font-size: 0.8em;
     height: 17px;
     text-align: center;
-    width: 30px;
+    width: 26px;
 }
 .team-ALA, .team-GET, .team-RSO {
     background-color: blue;
@@ -146,7 +145,7 @@ html {
     font-size: 0.8em;
     height: 17px;
     text-align: center;
-    width: 30px;
+    width: 26px;
 }
 .own-COC {
     background-color: green;

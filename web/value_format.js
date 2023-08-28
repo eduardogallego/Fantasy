@@ -4,13 +4,13 @@ function percentFormatter(value, row) {
 }
 
 function positionFormatter(value, row) {
-    var position = 'POR';
+    var position = 'P';
     if (value === 2) {
-        position = 'DEF';
+        position = 'D';
     } else if (value === 3) {
-        position = 'CEN';
+        position = 'C';
     } else if (value === 4) {
-        position = 'DEL';
+        position = 'A';
     }
     return '<span class="position pos-' + value + '">' + position + '</span>';
 }
@@ -98,14 +98,14 @@ function playerFormatter(value, row) {
     var status = '';
     if (row.status != 'ok') {
         if (row.status === 'doubtful') {
-            status = ' <i class="bi bi-question-circle-fill"></i>';
+            status = '<i class="bi bi-question-circle-fill"></i>';
         } else if (row.status === 'injured') {
-            status = ' <i class="bi bi-bandaid-fill"></i>';
+            status = '<i class="bi bi-bandaid-fill"></i>';
         } else if (row.status === 'out_of_league') {
-            status = ' <i class="bi bi-forward-fill"></i>';
+            status = '<i class="bi bi-forward-fill"></i>';
         } else if (row.status === 'suspended') {
-            status = ' <i class="bi bi-file-fill"></i>';
+            status = '<i class="bi bi-file-fill"></i>';
         }
     }
-    return icons + value + status
+    return value + ' ' + icons + status
 }
