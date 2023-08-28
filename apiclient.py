@@ -107,6 +107,18 @@ class ApiClient:
         ini_value = response_list[len(response_list) - history_size - 1]['marketValue']
         return round((end_value - ini_value) * 100 / ini_value)
 
+    def get_max_active_week(self):
+        response = requests.get(self.config.get("config_url"), headers=self.headers)
+        if response.status_code != 200:
+            self.logger.error('Get config %s - Error: %s' % (response.status_code, response.reason))
+            return
+        response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
+        self.logger.info('Get config %s - Ok' % response.status_code)
+        for sub_dict in response_dict:
+            if 'name' in sub_dict and sub_dict['name'] == 'active_weeks':
+                return max(sub_dict['value'])
+        return 0
+
     def get_operations(self):
         response = requests.get(self.config.get("history_url"), headers=self.headers)
         if response.status_code != 200:
@@ -171,6 +183,7 @@ class ApiClient:
 
     def get_teams(self):
         teams = []
+        max_week = self.get_max_active_week()
         for team_id in self.config.get("teams"):
             response = requests.get(self.config.get("team_url") % team_id, headers=self.headers)
             if response.status_code != 200:
@@ -201,14 +214,16 @@ class ApiClient:
                     if stat['stats']['mins_played'][0] > 0:
                         played_matches += 1
                         non_peak_matches_points.append(stat['totalPoints'])
-                    last_5_matches_points.append(stat['totalPoints'])
+                    if stat['weekNumber'] > (max_week - 5):
+                        last_5_matches_points.append(stat['totalPoints'])
                 points_per_match = round(total_points * 100 / played_matches) if played_matches > 0 else 0
                 peaks = int((played_matches + 2) / 5)
                 non_peak_matches_points.sort()
                 non_peak_matches_points = non_peak_matches_points[peaks: len(non_peak_matches_points) - peaks]
                 non_peak_matches_mean = round(sum(non_peak_matches_points) * 100 / len(non_peak_matches_points)) \
                     if played_matches > 0 else 0
-                last_5_matches_points = last_5_matches_points[-5:]
+                for i in range(max_week - len(last_5_matches_points)):
+                    last_5_matches_points.append(0)
                 last_5_matches_mean = round(sum(last_5_matches_points) * 100 / len(last_5_matches_points)) \
                     if played_matches > 0 else 0
                 average = round((points_per_match + last_5_matches_mean + non_peak_matches_mean) / 3)
@@ -227,5 +242,6 @@ if __name__ == "__main__":
     # print(json.dumps(api_client.get_market_variation_3d('58')))
     # print(json.dumps(api_client.get_operations()))
     # print(json.dumps(api_client.get_players()))
+    # print(api_client.get_max_active_week())
     # print(api_client.get_teams())
     # print(api_client.get_points(1))
