@@ -13,9 +13,9 @@ html {
 }
 
 .index {
-    padding-right: 8px !important;
+    padding-right: 4px !important;
     text-align: right;
-    width: 50px;
+    width: 30px;
 }
 
 .tag {
