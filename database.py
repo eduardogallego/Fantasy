@@ -293,7 +293,8 @@ class Database:
     def update_points(self):
         cursor = self.connection.cursor()
         cursor.execute('DELETE FROM points')
-        for i in range(1, 4):
+        last_week = self.api_client.get_last_week_with_points()
+        for i in range(1, last_week + 1):
             points = self.api_client.get_points(i)
             cursor.executemany(f'INSERT OR IGNORE INTO points(id, player, team, pos, j{i}) VALUES(?,?,?,?,?)', points)
             for player in points:
