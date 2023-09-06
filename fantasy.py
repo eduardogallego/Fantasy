@@ -144,7 +144,7 @@ def update_market():
 @app.route('/update_operations', methods=['GET'])
 def update_operations():
     database = Database(config)
-    database.update_market()
+    database.update_operations()
     return redirect("/operations")
 
 
@@ -165,6 +165,7 @@ def update_points():
 @app.route('/update_team', methods=['GET'])
 def update_team():
     database = Database(config)
+    database.update_operations()
     database.update_teams()
     return redirect("/team")
 

@@ -383,7 +383,7 @@ if __name__ == "__main__":
     database = Database(configuration)
     # database.update_operations()
     # print(json.dumps(database.get_operations()))
-    # database.update_teams()
+    database.update_teams()
     # print(json.dumps(database.get_team_status()))
     # print(json.dumps(database.get_team()))
     # print(json.dumps(database.get_rivals()))
