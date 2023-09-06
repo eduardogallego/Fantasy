@@ -120,6 +120,19 @@ class ApiClient:
         ini_value = response_list[len(response_list) - history_size - 1]['marketValue']
         return round((end_value - ini_value) * 100 / ini_value)
 
+    def get_news(self):
+        news = []
+        for i in range(10):
+            response = requests.get(self.config.get("news_url") % (i + 1), headers=self.headers)
+            if response.status_code != 200:
+                self.logger.error('Get news %s - Error: %s' % (response.status_code, response.reason))
+                return
+            response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
+            self.logger.info('Get news %s - Ok' % response.status_code)
+            for new in response_dict:
+                news.append({'date': new['publicationDate'], 'title': new['title'], 'message': new['msg']})
+        return news
+
     def get_operations(self):
         response = requests.get(self.config.get("history_url"), headers=self.headers)
         if response.status_code != 200:
@@ -250,3 +263,4 @@ if __name__ == "__main__":
     # print(api_client.get_last_week_with_points())
     # print(api_client.get_teams())
     # print(api_client.get_points(1))
+    print(api_client.get_news())

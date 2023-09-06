@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 
@@ -15,7 +16,6 @@ logger = logging.getLogger('server')
 config = Config()
 app = Flask(__name__)
 app.secret_key = config.get('secret_key')
-api_client = ApiClient(config)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "/login"
@@ -64,6 +64,20 @@ def market():
 def market_json():
     database = Database(config)
     return database.get_market()
+
+
+@app.route('/news', methods=['GET'])
+@login_required
+def news():
+    database = Database(config)
+    money, value, points = database.get_team_status()
+    return render_template("news.html", points=points, cash=money, team=value, total=(money + value))
+
+
+@app.route('/news.json', methods=['GET'])
+def news_json():
+    api_client = ApiClient(config)
+    return json.dumps(api_client.get_news())
 
 
 @app.route('/players', methods=['GET'])
