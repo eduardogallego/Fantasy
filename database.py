@@ -190,7 +190,7 @@ class Database:
             index = value_list.index(row[11]) + 1
             buy_value = None if row[4] is None else '{0:.2f}'.format(round(row[4] / 1000000, 2))
             benefit = None if row[4] is None else '{0:.2f}'.format(round((row[5] - row[4]) / 1000000, 2))
-            percent_ben = None if row[4] is None else round((row[5] - row[4]) * 100 / row[4])
+            perc_ben = None if row[4] is None else round((row[5] - row[4]) * 100 / row[4])
             clause_secs = round((datetime.fromisoformat(row[7]) - datetime.now(timezone.utc)).total_seconds())
             clause = '{0:.2f}'.format(round(row[6] / 1000000, 2))
             if clause_secs > 86400:
@@ -201,11 +201,12 @@ class Database:
                 clause = f'{round(clause_secs / 60)}m'
             elif clause_secs > 0:
                 clause = f'{clause_secs}s'
+            perc_clause = None if clause_secs > 0 else round(((row[6] - row[5]) * 100) / row[5])
             result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "buy_value": buy_value, "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
-                           "clause": clause, "benefit": benefit, "percent_ben": percent_ben,
+                           "clause": clause, "perc_clause": perc_clause, "benefit": benefit, "perc_ben": perc_ben,
                            "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
-                           "percent_chg_3d": row[8], "points": row[9], "matches": row[10],
+                           "perc_chg_3d": row[8], "points": row[9], "matches": row[10],
                            "average": '{0:.2f}'.format(round(row[11] / 100, 2)), "tag": row[12]})
         return json.dumps(result)
 
@@ -234,11 +235,13 @@ class Database:
                 clause = f'{round(clause_secs / 60)}m'
             elif clause_secs > 0:
                 clause = f'{clause_secs}s'
+            perc_clause = None if clause_secs > 0 else round(((row[6] - row[5]) * 100) / row[5])
             result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "manager": row[4], "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
-                           "clause": clause, "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
-                           "percent_chg_3d": row[8], "points": row[9], "matches": row[10],
-                           "average": '{0:.2f}'.format(round(row[11] / 100, 2)), "tag": row[12]})
+                           "clause": clause, "perc_clause": perc_clause,
+                           "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)), "perc_chg_3d": row[8],
+                           "points": row[9], "matches": row[10], "average": '{0:.2f}'.format(round(row[11] / 100, 2)),
+                           "tag": row[12]})
         return json.dumps(result)
 
     def get_team_status(self):

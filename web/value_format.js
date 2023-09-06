@@ -1,6 +1,10 @@
 
 function percentFormatter(value, row) {
-    return value + '%';
+    if (value == null) {
+        return '';
+    } else {
+        return value + '%';
+    }
 }
 
 function positionFormatter(value, row) {
