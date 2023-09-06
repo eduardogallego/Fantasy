@@ -1,4 +1,13 @@
 
+function dateFormatter(value, row) {
+    if (value == null) {
+        return '';
+    } else {
+        var options = { weekday: 'short', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        return (new Date(value)).toLocaleString("en-US", options);
+    }
+}
+
 function percentFormatter(value, row) {
     if (value == null) {
         return '';
