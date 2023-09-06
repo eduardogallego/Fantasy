@@ -96,16 +96,16 @@ class Database:
 
     def get_operations(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, pos, buy_tt, buy_value, sale_tt, sale_value FROM operations "
-                       "WHERE sale_tt IS NOT NULL ORDER BY sale_tt DESC, buy_tt DESC")
+        cursor.execute("SELECT name, pos, buy_tt, buy_value, sale_tt, sale_value, clause_update, buyer, seller "
+                       "FROM operations WHERE sale_tt IS NOT NULL ORDER BY sale_tt DESC, buy_tt DESC")
         rows = cursor.fetchall()
         result = []
         benefit_list = []
         for row in rows:
-            benefit_list.append(row[5] - row[3])
+            benefit_list.append(row[5] - row[3] - row[6])
         list.sort(benefit_list, reverse=True)
         for row in rows:
-            benefit = row[5] - row[3]
+            benefit = row[5] - row[3] - row[6]
             index = benefit_list.index(benefit) + 1
             result.append({"index": index, "name": row[0], "pos": row[1],
                            "buy_tt": datetime.fromisoformat(row[2]).strftime('%d-%m-%y'),
@@ -113,7 +113,9 @@ class Database:
                            "sale_tt": datetime.fromisoformat(row[4]).strftime('%d-%m-%y'),
                            "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
                            "benefit": '{0:.2f}'.format(round(benefit / 1000000, 2)),
-                           "percent": round((row[5] - row[3]) * 100 / row[3], 0)})
+                           "percent": round((row[5] - row[3]) * 100 / row[3], 0),
+                           "clause_update": '{0:.2f}'.format(round(row[6] / 1000000, 2)),
+                           "buyer": row[7], "seller": row[8]})
         return json.dumps(result)
 
     def get_points(self):
@@ -261,23 +263,33 @@ class Database:
         cursor.execute("SELECT status_value FROM status WHERE status_key = 'last_operation'")
         last_operation = cursor.fetchone()[0]
         sale_operations = []
+        clause_updates = []
         buy_operations = []
         latest_operation = None
         for operation in self.api_client.get_operations():
             if datetime.fromisoformat(operation['timestamp']) > datetime.fromisoformat(last_operation):
                 if operation['type'] == 'sale':
                     sale_operations.append(operation)
-                else:
+                elif operation['type'] == 'buyout_updated':
+                    clause_updates.append((operation['player_id'], operation['money'] - operation['previous_money']))
+                elif operation['type'] == 'purchase':
                     buy_operations.append((operation['player_id'], operation['name'], operation['pos'],
-                                           operation['timestamp'], operation['value']))
+                                           operation['timestamp'], operation['money'], operation['to_from']))
                 if latest_operation is None or operation['timestamp'] > latest_operation:
                     latest_operation = operation['timestamp']
         if buy_operations:
-            cursor.executemany('INSERT INTO operations(player_id,name,pos,buy_tt,buy_value) VALUES(?,?,?,?,?)',
+            cursor.executemany('INSERT INTO operations(player_id,name,pos,buy_tt,buy_value,seller) VALUES(?,?,?,?,?,?)',
                                buy_operations)
+        for clause_update in clause_updates:
+            cursor.execute(f"SELECT clause_update FROM operations "
+                           f"WHERE player_id = '{clause_update[0]}' AND sale_tt IS NULL")
+            previous_clause = cursor.fetchone()[0]
+            cursor.execute(f"UPDATE operations SET clause_update = '{previous_clause + clause_update[1]}' "
+                           f"WHERE player_id = '{clause_update[0]}' AND sale_tt IS NULL")
         for sale in sale_operations:
-            cursor.execute(f"UPDATE operations SET sale_tt = '{sale['timestamp']}', sale_value = {sale['value']} "
-                           f"WHERE player_id = '{sale['player_id']}' AND sale_tt IS NULL")
+            buyer = 'NULL' if sale['to_from'] is None else f"'{sale['to_from']}'"
+            cursor.execute(f"UPDATE operations SET sale_tt = '{sale['timestamp']}', sale_value = {sale['money']}, "
+                           f"buyer = {buyer} WHERE player_id = '{sale['player_id']}' AND sale_tt IS NULL")
         if latest_operation is not None:
             self.update_status(cursor, 'last_operation', latest_operation)
         self.connection.commit()

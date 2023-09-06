@@ -28,11 +28,8 @@
         <script src="/web/value_format.js"></script>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/update">
-                    <img src="/images/futbol.png" alt="Logo" width="26"
-                         height="26" class="d-inline-block align-text-top">
-                    Fantasy
-                </a>
+                {% block update %}
+                {% endblock %}
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">

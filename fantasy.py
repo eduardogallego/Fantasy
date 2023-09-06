@@ -134,14 +134,38 @@ def rivals_json():
     return database.get_rivals()
 
 
-@app.route('/update', methods=['GET'])
-def update():
+@app.route('/update_market', methods=['GET'])
+def update_market():
     database = Database(config)
-    database.update_operations()
-    database.update_teams()
     database.update_market()
+    return redirect("/market")
+
+
+@app.route('/update_operations', methods=['GET'])
+def update_operations():
+    database = Database(config)
+    database.update_market()
+    return redirect("/operations")
+
+
+@app.route('/update_players', methods=['GET'])
+def update_players():
+    database = Database(config)
     database.update_players()
+    return redirect("/players")
+
+
+@app.route('/update_points', methods=['GET'])
+def update_points():
+    database = Database(config)
     database.update_points()
+    return redirect("/points")
+
+
+@app.route('/update_team', methods=['GET'])
+def update_team():
+    database = Database(config)
+    database.update_teams()
     return redirect("/team")
 
 

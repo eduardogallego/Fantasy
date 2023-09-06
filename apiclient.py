@@ -67,6 +67,7 @@ class ApiClient:
         self.logger.info('Authentication Ok: %s' % response.status_code)
 
     def get_last_week_with_points(self):
+        # return 4
         response = requests.get(self.config.get("config_url"), headers=self.headers)
         if response.status_code != 200:
             self.logger.error('Get config %s - Error: %s' % (response.status_code, response.reason))
@@ -126,17 +127,21 @@ class ApiClient:
             return
         response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
         self.logger.info('Get operations %s - Ok' % response.status_code)
-        response = []
+        operations = []
         for operation in response_dict:
             operation_type = operation['operation']
-            value = operation['money']
+            money = operation['money']
+            previous_money = operation['previousMoney'] if 'previousMoney' in operation else None
             timestamp = operation['date']
             player_id = operation['player']['id']
             player_name = operation['player']['nickname']
             player_position = operation['player']['positionId']
-            response.append({"player_id": player_id, "name": player_name, "pos": player_position,
-                             "type": operation_type, "value": value, "timestamp": timestamp})
-        return response
+            to_from = operation['toFrom']['managerName'] if 'toFrom' in operation else None
+            operations.append({"player_id": player_id, "name": player_name, "pos": player_position,
+                               "type": operation_type, "money": money, "previous_money": previous_money,
+                               "timestamp": timestamp, "to_from": to_from})
+        operations.reverse()
+        return operations
 
     def get_players(self):
         response = requests.get(self.config.get("players_url"), headers=self.headers)

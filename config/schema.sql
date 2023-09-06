@@ -21,9 +21,11 @@ CREATE TABLE operations (
   pos INTEGER NOT NULL,
   buy_tt TIMESTAMP NOT NULL,
   buy_value INTEGER NOT NULL,
+  clause_update INTEGER NOT NULL DEFAULT 0,
   sale_tt TIMESTAMP,
   sale_value INTEGER,
-  mean_value REAL DEFAULT 0);
+  buyer TEXT,
+  seller TEXT);
 
 DROP TABLE IF EXISTS players;
 CREATE TABLE players (
