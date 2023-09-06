@@ -113,7 +113,7 @@ class Database:
                            "sale_tt": datetime.fromisoformat(row[4]).strftime('%d-%m-%y'),
                            "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
                            "benefit": '{0:.2f}'.format(round(benefit / 1000000, 2)),
-                           "percent": round((row[5] - row[3]) * 100 / row[3], 0),
+                           "percent": round((row[5] - row[3] - row[6]) * 100 / row[3], 0),
                            "clause_update": '{0:.2f}'.format(round(row[6] / 1000000, 2)),
                            "buyer": row[7], "seller": row[8]})
         return json.dumps(result)
