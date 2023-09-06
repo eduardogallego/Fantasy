@@ -31,10 +31,10 @@ class Database:
         result = []
         value_list = []
         for row in rows:
-            value_list.append(row[4])
+            value_list.append(row[7])
         list.sort(value_list, reverse=True)
         for row in rows:
-            index = value_list.index(row[4]) + 1
+            index = value_list.index(row[7]) + 1
             result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "percent_chg_3d": row[5],
                            "points": row[6], "average": '{0:.2f}'.format(round(row[7], 2)), "bids": row[8],
