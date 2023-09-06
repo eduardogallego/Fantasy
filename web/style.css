@@ -21,6 +21,11 @@ html {
 .tag {
     width: 20px;
 }
+
+.left {
+    padding-left: 4px !important;
+    text-align: left;
+}
 .right {
     padding-right: 4px !important;
     text-align: right;
