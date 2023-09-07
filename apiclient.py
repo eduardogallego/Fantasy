@@ -4,6 +4,7 @@ import os
 import requests
 import time
 
+from htmlparser import StartingTeamParser
 from utils import Config
 
 
@@ -199,6 +200,23 @@ class ApiClient:
                            player['weekPoints'] if 'weekPoints' in player else None))
         return points
 
+    def get_starting_teams(self):
+        starting_teams = []
+        for team in ['alaves', 'almeria', 'athletic', 'atletico', 'barcelona', 'betis', 'cadiz', 'celta', 'getafe',
+                     'girona', 'granada', 'las-palmas', 'mallorca', 'osasuna', 'rayo-vallecano', 'real-madrid',
+                     'real-sociedad', 'sevilla', 'valencia', 'villarreal']:
+            response = requests.get(self.config.get("starting_teams_url") % team)
+            if response.status_code != 200:
+                self.logger.error('Get starting team %s - Error: %s' % (response.status_code, response.reason))
+                return
+            self.logger.info('Get starting team %s - Ok' % response.status_code)
+            response_html = response.text.encode().decode('utf-8-sig')
+            html_parser = StartingTeamParser(team)
+            html_parser.feed(response_html)
+            starting_teams.append(
+                {'team': team, 'rival': html_parser.rival, 'local': html_parser.local, 'players': html_parser.players})
+        return starting_teams
+
     def get_teams(self):
         teams = []
         last_week = self.get_last_week_with_points()
@@ -263,4 +281,5 @@ if __name__ == "__main__":
     # print(api_client.get_last_week_with_points())
     # print(api_client.get_teams())
     # print(api_client.get_points(1))
-    print(api_client.get_news())
+    # print(api_client.get_news())
+    print(api_client.get_starting_teams())

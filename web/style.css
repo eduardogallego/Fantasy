@@ -12,6 +12,14 @@ html {
     padding: 0;
 }
 
+.bootstrap-table .fixed-table-container .table thead th .th-inner {
+    padding: 0.3rem;
+}
+
+.bootstrap-table .fixed-table-container .table thead th .sortable {
+    padding-right: 20px!important;
+}
+
 .index {
     padding-right: 4px !important;
     text-align: right;
@@ -23,7 +31,7 @@ html {
 }
 
 .left {
-    padding-left: 4px !important;
+    padding-left: 2px !important;
     text-align: left;
 }
 .right {
