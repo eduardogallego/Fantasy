@@ -25,13 +25,13 @@ class StartingTeamParser(HTMLParser):
         self.players = []
 
     def handle_starttag(self, tag, attrs):
-        if tag == 'a' and self.status == '':
+        if tag == 'div' and self.status == '':
             for attr in attrs:
-                if attr[0] == 'class' and attr[1] == 'juggador':
-                    self.status = 'jug_a'
+                if attr[0] == 'class' and attr[1] == 'juggadores':
+                    self.status = 'player_container'
                     break
-        elif tag == 'span' and self.status == 'jug_a':
-            self.status = 'jug_s'
+        elif tag == 'span' and self.status == 'player_container':
+            self.status = 'player'
         elif tag == 'div' and self.status == '':
             for attr in attrs:
                 if attr[0] == 'class' and attr[1] == 'row mini-match-info mb-2':
@@ -51,12 +51,13 @@ class StartingTeamParser(HTMLParser):
                     break
 
     def handle_endtag(self, tag):
-        if tag == 'span' and self.status == 'jug_s':
-            self.status = 'jug_p'
+        if tag == 'span' and self.status == 'player':
+            self.status = 'player_percentage'
 
     def handle_data(self, data):
-        if self.status == 'jug_s':
+        if self.status == 'player':
             self.player = unicodedata.normalize('NFKD', data).encode('ASCII', 'ignore').decode('utf-8').lower()
-        elif self.status == 'jug_p' and '%' in data:
+            self.status = 'player_percentage'
+        elif self.status == 'player_percentage' and '%' in data:
             self.players.append((self.player, data.strip()[:-1]))
             self.status = ''
