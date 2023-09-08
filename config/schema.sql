@@ -48,6 +48,15 @@ CREATE TABLE managers (
   team_value INTEGER NOT NULL,
   points INTEGER NOT NULL);
 
+DROP TABLE IF EXISTS next;
+CREATE TABLE next (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  team TEXT NOT NULL,
+  player TEXT NOT NULL,
+  rival TEXT NOT NULL,
+  inout TEXT NOT NULL,
+  percentage INTEGER);
+
 DROP TABLE IF EXISTS points;
 CREATE TABLE points (
   id TEXT PRIMARY KEY,

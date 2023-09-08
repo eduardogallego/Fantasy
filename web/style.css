@@ -31,11 +31,11 @@ html {
 }
 
 .left {
-    padding-left: 2px !important;
+    padding-left: 3px !important;
     text-align: left;
 }
 .right {
-    padding-right: 4px !important;
+    padding-right: 3px !important;
     text-align: right;
 }
 
@@ -61,6 +61,12 @@ html {
     color: black;
 }
 .bi-file-fill {
+    color: red;
+}
+.bi-house-fill {
+    color: green;
+}
+.bi-globe {
     color: red;
 }
 

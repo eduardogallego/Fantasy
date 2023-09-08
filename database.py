@@ -42,6 +42,18 @@ class Database:
                            "seller": row[10], "tag": 0})
         return json.dumps(result)
 
+    def get_next_match(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT team, player, rival, inout, percentage FROM next ORDER BY team ASC, percentage DESC")
+        rows = cursor.fetchall()
+        result = []
+        index = 0
+        for row in rows:
+            index += 1
+            result.append({"index": index, "team": row[0], "player": row[1], "rival": row[2],
+                           "inout": row[3], "percentage": row[4]})
+        return json.dumps(result)
+
     def get_players(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, team, pos, status, sale_value, points, average_points, last_season_points, seller "
@@ -261,6 +273,17 @@ class Database:
                            'average,bids,myBid,seller) VALUES(?,?,?,?,?,?,?,?,?,?,?)', market)
         self.connection.commit()
 
+    def update_next_match(self):
+        cursor = self.connection.cursor()
+        starting_teams = self.api_client.get_starting_teams()
+        players = []
+        for team in starting_teams:
+            for player in team['players']:
+                players.append((team['team'], player[0], team['rival'], team['in_out'], player[1]))
+        cursor.execute('DELETE FROM next')
+        cursor.executemany('INSERT INTO next(team,player,rival,inout,percentage) VALUES(?,?,?,?,?)', players)
+        self.connection.commit()
+
     def update_operations(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT status_value FROM status WHERE status_key = 'last_operation'")
@@ -382,16 +405,17 @@ if __name__ == "__main__":
     configuration = Config()
     database = Database(configuration)
     # database.update_operations()
-    # print(json.dumps(database.get_operations()))
+    # print(database.get_operations())
     # database.update_teams()
-    # print(json.dumps(database.get_team_status()))
-    # print(json.dumps(database.get_team()))
-    # print(json.dumps(database.get_rivals()))
+    # print(database.get_team_status())
+    # print(database.get_team())
+    # print(database.get_rivals())
     # database.update_market()
-    # print(json.dumps(database.get_market()))
+    # print(database.get_market())
     # database.update_players()
-    # print(json.dumps(database.get_players()))
-    # print(json.dumps(database.get_players_top()))
+    # print(database.get_players())
+    # print(database.get_players_top())
     # database.update_points()
-    # print(json.dumps(database.get_points()))
-
+    # print(database.get_points())
+    # database.update_next_match()
+    # print(database.get_next_match())

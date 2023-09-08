@@ -66,6 +66,20 @@ def market_json():
     return database.get_market()
 
 
+@app.route('/next_match', methods=['GET'])
+@login_required
+def next_match():
+    database = Database(config)
+    money, value, points = database.get_team_status()
+    return render_template("next_match.html", points=points, cash=money, team=value, total=(money + value))
+
+
+@app.route('/next_match.json', methods=['GET'])
+def next_match_json():
+    database = Database(config)
+    return database.get_next_match()
+
+
 @app.route('/news', methods=['GET'])
 @login_required
 def news():
@@ -94,7 +108,7 @@ def players_json():
     return database.get_players()
 
 
-@app.route('/players-top.json', methods=['GET'])
+@app.route('/players_top.json', methods=['GET'])
 def players_top_json():
     database = Database(config)
     return database.get_players_top()
@@ -153,6 +167,13 @@ def update_market():
     database = Database(config)
     database.update_market()
     return redirect("/market")
+
+
+@app.route('/update_next_match', methods=['GET'])
+def update_next_match():
+    database = Database(config)
+    database.update_next_match()
+    return redirect("/next_match")
 
 
 @app.route('/update_operations', methods=['GET'])

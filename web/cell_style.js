@@ -25,6 +25,16 @@ function cellStyleIndexInactive(value, row, index) {
     }
 }
 
+function cellStypePercent(value, row, index) {
+    extra = ''
+    if (value !== null) {
+        extra = ' scale-' + Math.min(Math.round(value / 10), 9);
+    }
+    return {
+        classes: 'right' + extra
+    }
+}
+
 function cellStylePoints(value, row, index) {
     extra = ''
     if (value !== null) {

@@ -122,3 +122,7 @@ function playerFormatter(value, row) {
     }
     return value + ' ' + icons + status
 }
+
+function inoutFormatter(value, row) {
+    return value === 'in' ? '<i class="bi bi-house-fill"></i>' : '<i class="bi bi-globe"></i>';
+}

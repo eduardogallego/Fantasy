@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block head %}
+<meta http-equiv="refresh" content="300">
+{% endblock %}
+
+{% block update %}
+<a class="navbar-brand" href="/update_next_match">
+    <img src="/images/futbol.png" alt="Logo" width="26"
+         height="26" class="d-inline-block align-text-top">
+    Fantasy
+</a>
+{% endblock %}
+
+{% block card_body %}
+<script src=”web/javascript.js”></script>
+<table class="table-borderless" data-toggle="table" data-search="true" data-url="next_match.json">
+  <thead>
+    <tr>
+      <th class="index" data-field="index" data-sortable="true">#</th>
+      <th class="tag" data-sortable="true" data-field="team" data-formatter="teamFormatter">T</th>
+      <th data-sortable="true" data-field="player">Player</th>
+      <th class="right" data-cell-style="cellStypePercent" data-sortable="true"
+          data-field="percentage" data-formatter="percentFormatter">%</th>
+      <th class="tag" data-sortable="true" data-field="rival" data-formatter="teamFormatter">R</th>
+      <th class="tag" data-sortable="true" data-field="inout" data-formatter="inoutFormatter">IO</th>
+    </tr>
+  </thead>
+</table>
+{% endblock %}
