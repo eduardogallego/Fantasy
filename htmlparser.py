@@ -30,13 +30,11 @@ class StartingTeamParser(HTMLParser):
                 if attr[0] == 'class' and attr[1] == 'juggadores':
                     self.status = 'player_container'
                     break
-        elif tag == 'span' and self.status == 'player_container':
-            self.status = 'player'
-        elif tag == 'div' and self.status == '':
-            for attr in attrs:
-                if attr[0] == 'class' and attr[1] == 'row mini-match-info mb-2':
+                elif attr[0] == 'class' and attr[1] == 'row mini-match-info mb-2':
                     self.status = 'out'
                     break
+        elif tag == 'span' and self.status == 'player_container':
+            self.status = 'player'
         elif tag == 'img' and self.status in ['in', 'out']:
             for attr in attrs:
                 if attr[0] == 'alt':
