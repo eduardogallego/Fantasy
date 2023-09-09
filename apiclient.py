@@ -211,8 +211,7 @@ class ApiClient:
             response_html = response.text.encode().decode('utf-8-sig')
             html_parser = StartingTeamParser(team)
             html_parser.feed(response_html)
-            starting_teams.append({'team': StartingTeamParser.teams_dict.get(html_parser.team, html_parser.team),
-                                   'rival': StartingTeamParser.teams_dict.get(html_parser.rival, html_parser.rival),
+            starting_teams.append({'team': html_parser.team, 'rival': html_parser.rival,
                                    'in_out': html_parser.in_out, 'players': html_parser.players})
         return starting_teams
 

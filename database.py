@@ -4,6 +4,7 @@ import sqlite3
 
 from apiclient import ApiClient
 from datetime import datetime, timezone
+from htmlparser import StartingTeamParser
 from sqlite3 import Error
 from utils import Config
 
@@ -189,8 +190,9 @@ class Database:
 
     def get_team(self):
         cursor = self.connection.cursor()
-        cursor.execute(f'SELECT player, team, pos, status, buy_value, sale_value, clause_value, '
-                       f'clause_tt, percent_change_3d, points, matches, average, tag FROM teams '
+        cursor.execute(f'SELECT t.player, t.team, pos, status, buy_value, sale_value, clause_value, clause_tt, '
+                       f'percent_change_3d, points, matches, average, tag, rival, inout, percentage '
+                       f'FROM teams AS t LEFT JOIN next AS n ON t.team = n.team and t.player = n.player '
                        f'WHERE manager_id == "{self.config.get("team_id")}" ORDER BY pos ASC, average DESC')
         rows = cursor.fetchall()
         result = []
@@ -219,16 +221,18 @@ class Database:
                            "clause": clause, "perc_clause": perc_clause, "benefit": benefit, "perc_ben": perc_ben,
                            "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)),
                            "perc_chg_3d": row[8], "points": row[9], "matches": row[10],
-                           "average": '{0:.2f}'.format(round(row[11] / 100, 2)), "tag": row[12]})
+                           "average": '{0:.2f}'.format(round(row[11] / 100, 2)), "tag": row[12],
+                           "rival": row[13], "inout": row[14], "percentage": row[15]})
         return json.dumps(result)
 
     def get_rivals(self):
         cursor = self.connection.cursor()
-        cursor.execute(f'SELECT player, team, pos, status, managers.manager, sale_value, clause_value, clause_tt, '
-                       f'percent_change_3d, teams.points, matches, average, tag '
-                       f'FROM teams INNER JOIN managers ON teams.manager_id = managers.id '
+        cursor.execute(f'SELECT t.player, t.team, pos, status, m.manager, sale_value, clause_value, clause_tt, '
+                       f'percent_change_3d, t.points, matches, average, tag, rival, inout, percentage '
+                       f'FROM teams AS t INNER JOIN managers AS m ON t.manager_id = m.id '
+                       f'LEFT JOIN next AS n ON t.team = n.team and t.player = n.player '
                        f'WHERE manager_id != "{self.config.get("team_id")}" '
-                       f'ORDER BY managers.points DESC, managers.team_value DESC, pos ASC, average DESC')
+                       f'ORDER BY m.points DESC, m.team_value DESC, pos ASC, average DESC')
         rows = cursor.fetchall()
         result = []
         value_list = []
@@ -253,7 +257,7 @@ class Database:
                            "clause": clause, "perc_clause": perc_clause,
                            "change_3d": '{0:.2f}'.format(round(row[8] * row[5] / 100000000, 2)), "perc_chg_3d": row[8],
                            "points": row[9], "matches": row[10], "average": '{0:.2f}'.format(round(row[11] / 100, 2)),
-                           "tag": row[12]})
+                           "tag": row[12], "rival": row[13], "inout": row[14], "percentage": row[15]})
         return json.dumps(result)
 
     def get_team_status(self):
@@ -279,7 +283,10 @@ class Database:
         players = []
         for team in starting_teams:
             for player in team['players']:
-                players.append((team['team'], player[0], team['rival'], team['in_out'], player[1]))
+                players.append((StartingTeamParser.teams_dict.get(team['team'], team['team']),
+                                StartingTeamParser.players_dict.get(f"{team['team']}_{player[0]}", player[0]),
+                                StartingTeamParser.teams_dict.get(team['rival'], team['rival']),
+                                team['in_out'], player[1]))
         cursor.execute('DELETE FROM next')
         cursor.executemany('INSERT INTO next(team,player,rival,inout,percentage) VALUES(?,?,?,?,?)', players)
         self.connection.commit()

@@ -14,6 +14,10 @@ class StartingTeamParser(HTMLParser):
                   'granada': 'granada-cf', 'las-palmas': 'ud-las-palmas', 'mallorca': 'rcd-mallorca',
                   'osasuna': 'c-a-osasuna', 'rayo': 'rayo-vallecano', 'sevilla': 'sevilla-fc',
                   'valencia': 'valencia-cf', 'villarreal': 'villarreal-cf'}
+    players_dict = {'las-palmas_Alex Suárez': 'Álex Suárez',
+                    'osasuna_Rubén G.': 'Rubén García',
+                    'valencia_Duro': 'Hugo Duro'
+                    }
 
     def __init__(self, team):
         super().__init__()
@@ -54,7 +58,7 @@ class StartingTeamParser(HTMLParser):
 
     def handle_data(self, data):
         if self.status == 'player':
-            self.player = unicodedata.normalize('NFKD', data).encode('ASCII', 'ignore').decode('utf-8').lower()
+            self.player = data
             self.status = 'player_percentage'
         elif self.status == 'player_percentage' and '%' in data:
             self.players.append((self.player, data.strip()[:-1]))
