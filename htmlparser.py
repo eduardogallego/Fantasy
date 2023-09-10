@@ -14,10 +14,12 @@ class StartingTeamParser(HTMLParser):
                   'granada': 'granada-cf', 'las-palmas': 'ud-las-palmas', 'mallorca': 'rcd-mallorca',
                   'osasuna': 'c-a-osasuna', 'rayo': 'rayo-vallecano', 'sevilla': 'sevilla-fc',
                   'valencia': 'valencia-cf', 'villarreal': 'villarreal-cf'}
-    players_dict = {'las-palmas_Alex Suárez': 'Álex Suárez',
-                    'osasuna_Rubén G.': 'Rubén García',
-                    'valencia_Duro': 'Hugo Duro'
-                    }
+    players_dict = {
+        'betis_Ayoze': 'Ayoze Pérez',
+        'las-palmas_Alex Suárez': 'Álex Suárez',
+        'osasuna_Rubén G.': 'Rubén García',
+        'valencia_Javi Guerra': 'Guerra', 'valencia_Duro': 'Hugo Duro'
+        }
 
     def __init__(self, team):
         super().__init__()
