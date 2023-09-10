@@ -15,11 +15,26 @@ class StartingTeamParser(HTMLParser):
                   'osasuna': 'c-a-osasuna', 'rayo': 'rayo-vallecano', 'sevilla': 'sevilla-fc',
                   'valencia': 'valencia-cf', 'villarreal': 'villarreal-cf'}
     players_dict = {
+        'almeria_Puigmal': 'Arnau Puigmal', 'almeria_Luis Maximiano': 'Maximiano',
+        'athletic_R. de Galarreta': 'De Galarreta',
+        'atletico_M. Llorente': 'Marcos Llorente',
+        'barcelona_Gündogan': 'Gundogan', 'barcelona_Íñigo': 'Iñigo Martínez', 'barcelona_Cancelo': 'Joao Cancelo',
+        'barcelona_Yamal': 'Lamine Yamal', 'barcelona_Romeu': 'Oriol Romeu',
         'betis_Ayoze': 'Ayoze Pérez',
-        'las-palmas_Alex Suárez': 'Álex Suárez',
+        'cadiz_Ramos': 'Chris Ramos',
+        'celta_Domínguez': 'Carlos Domínguez', 'celta_Beltrán': 'Fran Beltrán',
+        'celta_Strand Larsen': 'Larsen', 'celta_Núñez': 'Unai Nuñez',
+        'getafe_Soria': 'David Soria',
+        'girona_Blind': 'Daley Blind', 'girona_Miguel': 'Miguel Gutiérrez', 'girona_Savinho': 'Sávio',
+        'las-palmas_Alex Suárez': 'Álex Suárez', 'las-palmas_J. Araujo': 'Araujo', 'las-palmas_Viera': 'Jonathan Viera',
+        'las-palmas_Marmol': 'Mika Marmol', 'las-palmas_Kaba': 'Sory Kaba',
         'osasuna_Rubén G.': 'Rubén García',
-        'valencia_Javi Guerra': 'Guerra', 'valencia_Duro': 'Hugo Duro'
-        }
+        'rayo_Valentín': 'Óscar Valentín',
+        'real-madrid_Lucas': 'Lucas Vázquez',
+        'real-sociedad_Brais': 'Brais Méndez',
+        'valencia_Javi Guerra': 'Guerra', 'valencia_Duro': 'Hugo Duro', 'valencia_Gayà': 'Gayá',
+        'villarreal_Sörloth': 'Sorloth',
+    }
 
     def __init__(self, team):
         super().__init__()
@@ -60,7 +75,7 @@ class StartingTeamParser(HTMLParser):
 
     def handle_data(self, data):
         if self.status == 'player':
-            self.player = data
+            self.player = data.strip()
             self.status = 'player_percentage'
         elif self.status == 'player_percentage' and '%' in data:
             self.players.append((self.player, data.strip()[:-1]))
