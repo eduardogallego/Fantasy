@@ -167,7 +167,7 @@ class ApiClient:
         players = []
         for player in response_dict:
             position = player['positionId']
-            if position == 5:
+            if position == 5 or position == '5':
                 continue
             name = player['nickname']
             team = player['team']['slug']
@@ -275,7 +275,7 @@ if __name__ == "__main__":
     # print(json.dumps(api_client.get_market()))
     # print(json.dumps(api_client.get_market_variation_3d('58')))
     # print(json.dumps(api_client.get_operations()))
-    # print(json.dumps(api_client.get_players()))
+    print(json.dumps(api_client.get_players()))
     # print(api_client.get_last_week_with_points())
     # print(api_client.get_teams())
     # print(api_client.get_points(1))

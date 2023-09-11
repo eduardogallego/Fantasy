@@ -26,8 +26,10 @@ class Database:
 
     def get_market(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, team, pos, status, buy_value, percent_change_3d, points, average, "
-                       "bids, myBid, seller FROM market ORDER BY average DESC, percent_change_3d DESC")
+        cursor.execute("SELECT name, m.team, pos, status, buy_value, percent_change_3d, "
+                       "points, average, bids, myBid, seller, rival, inout, percentage "
+                       "FROM market AS m LEFT JOIN next AS n ON m.team = n.team and name = player "
+                       "ORDER BY average DESC, percent_change_3d DESC")
         rows = cursor.fetchall()
         result = []
         value_list = []
@@ -40,7 +42,7 @@ class Database:
                            "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "percent_chg_3d": row[5],
                            "points": row[6], "average": '{0:.2f}'.format(round(row[7], 2)), "bids": row[8],
                            "myBid": '{0:.2f}'.format(round(row[9] / 1000000, 2)) if row[9] is not None else None,
-                           "seller": row[10], "tag": 0})
+                           "seller": row[10], "tag": 0, "rival": row[11], "inout": row[12], "percentage": row[13]})
         return json.dumps(result)
 
     def get_next_match(self):
@@ -57,8 +59,10 @@ class Database:
 
     def get_players(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, team, pos, status, sale_value, points, average_points, last_season_points, seller "
-                       "FROM players ORDER BY average_points DESC, points DESC, sale_value ASC")
+        cursor.execute("SELECT name, p.team, pos, status, sale_value, points, average_points, "
+                       "last_season_points, seller, rival, inout, percentage "
+                       "FROM players AS p LEFT JOIN next AS n ON p.team = n.team and name = player "
+                       "ORDER BY average_points DESC, points DESC, sale_value ASC")
         rows = cursor.fetchall()
         result = []
         index = 0
@@ -67,13 +71,16 @@ class Database:
             result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
                            "sale_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
                            "points": row[5], "average": '{0:.2f}'.format(round(row[6], 2)),
-                           "lastSeasonPoints": row[7], "seller": row[8], "tag": 0})
+                           "lastSeasonPoints": row[7], "seller": row[8], "rival": row[9],
+                           "inout": row[10], "percentage": row[11], "tag": 0})
         return json.dumps(result)
 
     def get_players_top(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, team, pos, status, sale_value, points, average_points, last_season_points, seller "
-                       "FROM players ORDER BY average_points DESC, points DESC, sale_value ASC")
+        cursor.execute("SELECT name, p.team, pos, status, sale_value, points, average_points, "
+                       "last_season_points, seller, rival, inout, percentage "
+                       "FROM players AS p LEFT JOIN next AS n ON p.team = n.team and name = player "
+                       "ORDER BY average_points DESC, points DESC, sale_value ASC")
         rows = cursor.fetchall()
         players = []
         goalkeepers = defenders = midfielders = strikers = 0
@@ -104,7 +111,8 @@ class Database:
             result.append({"index": index, "player": player[0], "team": player[1], "pos": player[2],
                            "status": player[3], "sale_value": '{0:.2f}'.format(round(player[4] / 1000000, 2)),
                            "points": player[5], "average": '{0:.2f}'.format(round(player[6], 2)),
-                           "lastSeasonPoints": player[7], "seller": player[8], "tag": player[9]})
+                           "lastSeasonPoints": player[7], "seller": player[8], "rival": player[9],
+                           "inout": player[10], "percentage": player[11], "tag": player[12]})
         return json.dumps(result)
 
     def get_operations(self):
