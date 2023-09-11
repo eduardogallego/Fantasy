@@ -60,6 +60,19 @@ function footPercBenefitFormatter(data) {
     data.forEach(function(data) {
         total_sale = total_sale + parseFloat(data.sale_value);
     });
+    return ((total_sale - total_buy) * 100 / total_buy).toFixed(0) + '%';
+}
+
+
+function footPercBenefitClauseFormatter(data) {
+    var total_buy = 0;
+    data.forEach(function(data) {
+        total_buy = total_buy + parseFloat(data.buy_value);
+    });
+    var total_sale = 0;
+    data.forEach(function(data) {
+        total_sale = total_sale + parseFloat(data.sale_value);
+    });
     var total_clause = 0;
     data.forEach(function(data) {
         total_clause = total_clause + parseFloat(data.clause_update);
