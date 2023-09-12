@@ -63,7 +63,6 @@ function footPercBenefitFormatter(data) {
     return ((total_sale - total_buy) * 100 / total_buy).toFixed(0) + '%';
 }
 
-
 function footPercBenefitClauseFormatter(data) {
     var total_buy = 0;
     data.forEach(function(data) {

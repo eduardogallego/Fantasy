@@ -88,10 +88,24 @@ def news():
     return render_template("news.html", points=points, cash=money, team=value, total=(money + value))
 
 
+@app.route('/news10', methods=['GET'])
+@login_required
+def news10():
+    database = Database(config)
+    money, value, points = database.get_team_status()
+    return render_template("news10.html", points=points, cash=money, team=value, total=(money + value))
+
+
 @app.route('/news.json', methods=['GET'])
 def news_json():
     api_client = ApiClient(config)
-    return json.dumps(api_client.get_news())
+    return json.dumps(api_client.get_news(1))
+
+
+@app.route('/news10.json', methods=['GET'])
+def news10_json():
+    api_client = ApiClient(config)
+    return json.dumps(api_client.get_news(10))
 
 
 @app.route('/players', methods=['GET'])

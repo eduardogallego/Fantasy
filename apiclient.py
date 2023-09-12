@@ -121,9 +121,9 @@ class ApiClient:
         ini_value = response_list[len(response_list) - history_size - 1]['marketValue']
         return round((end_value - ini_value) * 100 / ini_value)
 
-    def get_news(self):
+    def get_news(self, background):
         news = []
-        for i in range(10):
+        for i in range(background):
             response = requests.get(self.config.get("news_url") % (i + 1), headers=self.headers)
             if response.status_code != 200:
                 self.logger.error('Get news %s - Error: %s' % (response.status_code, response.reason))
@@ -279,5 +279,5 @@ if __name__ == "__main__":
     # print(api_client.get_last_week_with_points())
     # print(api_client.get_teams())
     # print(api_client.get_points(1))
-    # print(api_client.get_news())
+    # print(api_client.get_news(1))
     # print(api_client.get_starting_teams())
