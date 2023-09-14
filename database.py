@@ -129,9 +129,9 @@ class Database:
             benefit = row[5] - row[3] - row[6]
             index = benefit_list.index(benefit) + 1
             result.append({"index": index, "name": row[0], "pos": row[1],
-                           "buy_tt": datetime.fromisoformat(row[2]).strftime('%d-%m-%y'),
+                           "buy_tt": datetime.fromisoformat(row[2]).strftime('%d-%m'),
                            "buy_value": '{0:.2f}'.format(round(row[3] / 1000000, 2)),
-                           "sale_tt": datetime.fromisoformat(row[4]).strftime('%d-%m-%y'),
+                           "sale_tt": datetime.fromisoformat(row[4]).strftime('%d-%m'),
                            "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
                            "benefit": '{0:.2f}'.format(round(benefit / 1000000, 2)),
                            "percent": round(benefit * 100 / (row[3] + row[6]), 0),
