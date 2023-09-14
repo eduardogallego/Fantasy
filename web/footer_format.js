@@ -51,6 +51,18 @@ function footSum1DFormatter(data) {
     return sum.toFixed(1);
 }
 
+function footSumTopFormatter(data) {
+    var sum = 0;
+    var column = this.field;
+    data.forEach(function(data) {
+        eval('var value = data.' + column + ';');
+        if (value != null && data.tag > 0) {
+            sum = sum + parseFloat(value);
+        }
+    });
+    return sum.toFixed(0);
+}
+
 function footPercBenefitFormatter(data) {
     var total_buy = 0;
     data.forEach(function(data) {
