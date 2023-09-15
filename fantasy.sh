@@ -43,7 +43,7 @@ case "$1" in
             stop
             status
             ;;
-    'restart')
+    'restart'|'reload'|'reboot')
             stop
             start
             status
@@ -51,8 +51,11 @@ case "$1" in
     'status')
             status
             ;;
-    'update')
+    'update'|'upgrade')
             update
+            stop
+            start
+            status
             ;;
     *)
             echo "Usage: $0 { start | stop | restart | status | update }"
