@@ -118,23 +118,23 @@ class Database:
     def get_operations(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT name, pos, buy_tt, buy_value, sale_tt, sale_value, clause_update, buyer, seller "
-                       "FROM operations WHERE sale_tt IS NOT NULL ORDER BY sale_tt DESC, buy_tt DESC")
+                       "FROM operations ORDER BY sale_tt DESC, buy_tt DESC")
         rows = cursor.fetchall()
         result = []
         benefit_list = []
         for row in rows:
-            benefit_list.append(row[5] - row[3] - row[6])
+            benefit_list.append(0 if row[5] is None else (row[5] - row[3] - row[6]))
         list.sort(benefit_list, reverse=True)
         for row in rows:
-            benefit = row[5] - row[3] - row[6]
+            benefit = 0 if row[5] is None else (row[5] - row[3] - row[6])
             index = benefit_list.index(benefit) + 1
             result.append({"index": index, "name": row[0], "pos": row[1],
                            "buy_tt": datetime.fromisoformat(row[2]).strftime('%d-%m'),
                            "buy_value": '{0:.2f}'.format(round(row[3] / 1000000, 2)),
-                           "sale_tt": datetime.fromisoformat(row[4]).strftime('%d-%m'),
-                           "sale_value": '{0:.2f}'.format(round(row[5] / 1000000, 2)),
-                           "benefit": '{0:.2f}'.format(round(benefit / 1000000, 2)),
-                           "percent": round(benefit * 100 / (row[3] + row[6]), 0),
+                           "sale_tt": None if row[4] is None else datetime.fromisoformat(row[4]).strftime('%d-%m'),
+                           "sale_value": None if row[5] is None else '{0:.2f}'.format(round(row[5] / 1000000, 2)),
+                           "benefit": None if benefit is None else '{0:.2f}'.format(round(benefit / 1000000, 2)),
+                           "percent": None if benefit is None else round(benefit * 100 / (row[3] + row[6]), 0),
                            "clause_update": '{0:.2f}'.format(round(row[6] / 1000000, 2)),
                            "buyer": row[7], "seller": row[8]})
         return json.dumps(result)

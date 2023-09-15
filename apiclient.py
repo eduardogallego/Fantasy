@@ -68,7 +68,7 @@ class ApiClient:
         self.logger.info('Authentication Ok: %s' % response.status_code)
 
     def get_last_week_with_points(self):
-        # return 4
+        # return 5
         response = requests.get(self.config.get("config_url"), headers=self.headers)
         if response.status_code != 200:
             self.logger.error('Get config %s - Error: %s' % (response.status_code, response.reason))
@@ -219,6 +219,7 @@ class ApiClient:
         teams = []
         last_week = self.get_last_week_with_points()
         for team_id in self.config.get("teams"):
+        # for team_id in [self.config.get("team_id")]:
             response = requests.get(self.config.get("team_url") % team_id, headers=self.headers)
             if response.status_code != 200:
                 self.logger.error('Get teams %s - Error: %s' % (response.status_code, response.reason))
@@ -241,6 +242,10 @@ class ApiClient:
                 clause_tt = player['buyoutClauseLockedEndTime']
                 total_points = player['playerMaster']['points']
                 last_stats = player['playerMaster']['lastStats']
+                last_5_matches = [i for i in range(1, last_week + 1)]
+                if team in ['atletico-de-madrid', 'sevilla-fc']:
+                    last_5_matches.remove(4)
+                last_5_matches = last_5_matches[-5:]
                 played_matches = 0
                 non_peak_matches_points = []
                 last_5_matches_points = []
@@ -248,7 +253,7 @@ class ApiClient:
                     if stat['stats']['mins_played'][0] > 0:
                         played_matches += 1
                         non_peak_matches_points.append(stat['totalPoints'])
-                    if stat['weekNumber'] > (last_week - 5):
+                    if stat['weekNumber'] in last_5_matches:
                         last_5_matches_points.append(stat['totalPoints'])
                 points_per_match = round(total_points * 100 / played_matches) if played_matches > 0 else 0
                 peaks = int((played_matches + 2) / 5)
@@ -256,9 +261,7 @@ class ApiClient:
                 non_peak_matches_points = non_peak_matches_points[peaks: len(non_peak_matches_points) - peaks]
                 non_peak_matches_mean = round(sum(non_peak_matches_points) * 100 / len(non_peak_matches_points)) \
                     if played_matches > 0 else 0
-                for i in range(last_week - len(last_5_matches_points)):
-                    last_5_matches_points.append(0)
-                last_5_matches_mean = round(sum(last_5_matches_points) * 100 / len(last_5_matches_points)) \
+                last_5_matches_mean = round(sum(last_5_matches_points) * 100 / len(last_5_matches)) \
                     if played_matches > 0 else 0
                 average = round((points_per_match + last_5_matches_mean + non_peak_matches_mean) / 3)
                 percent_change_3d = self.get_market_variation_3d(player_id)
