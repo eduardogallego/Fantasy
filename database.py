@@ -80,6 +80,7 @@ class Database:
         cursor.execute("SELECT name, p.team, pos, status, sale_value, points, average_points, "
                        "last_season_points, seller, rival, inout, percentage "
                        "FROM players AS p LEFT JOIN next AS n ON p.team = n.team and name = player "
+                       "WHERE points > 2 * average_points "
                        "ORDER BY average_points DESC, points DESC, sale_value ASC")
         rows = cursor.fetchall()
         players = []
@@ -432,7 +433,7 @@ if __name__ == "__main__":
     # print(database.get_market())
     # database.update_players()
     # print(database.get_players())
-    # print(database.get_players_top())
+    print(database.get_players_top())
     # database.update_points()
     # print(database.get_points())
     # database.update_next_match()
