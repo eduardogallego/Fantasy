@@ -295,9 +295,9 @@ class Database:
         for team in starting_teams:
             for player in team['players']:
                 players.append((StartingTeamParser.teams_dict.get(team['team'], team['team']),
-                                StartingTeamParser.players_dict.get(f"{team['team']}_{player[0]}", player[0]),
+                                StartingTeamParser.players_dict.get(f"{team['team']}_{player}", player),
                                 StartingTeamParser.teams_dict.get(team['rival'], team['rival']),
-                                team['in_out'], player[1]))
+                                team['in_out'], team['players'][player]))
         cursor.execute('DELETE FROM next')
         cursor.executemany('INSERT INTO next(team,player,rival,inout,percentage) VALUES(?,?,?,?,?)', players)
         self.connection.commit()

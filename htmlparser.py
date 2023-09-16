@@ -80,7 +80,7 @@ class StartingTeamParser(HTMLParser):
         self.rival = ''
         self.status = ''
         self.player = ''
-        self.players = []
+        self.players = {}
 
     def handle_starttag(self, tag, attrs):
         if tag == 'div' and self.status == '':
@@ -109,11 +109,14 @@ class StartingTeamParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag == 'span' and self.status == 'player':
             self.status = 'player_percentage'
+        elif tag == 'div' and self.status == 'player_percentage' and self.player not in self.players:
+            self.players[self.player] = None
+            self.status = ''
 
     def handle_data(self, data):
         if self.status == 'player':
             self.player = data.strip()
             self.status = 'player_percentage'
         elif self.status == 'player_percentage' and '%' in data:
-            self.players.append((self.player, data.strip()[:-1]))
+            self.players[self.player] = data.strip()[:-1]
             self.status = ''

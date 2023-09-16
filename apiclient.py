@@ -202,6 +202,7 @@ class ApiClient:
 
     def get_starting_teams(self):
         starting_teams = []
+        # for team in ['atletico']:
         for team in StartingTeamParser.teams:
             response = requests.get(self.config.get("starting_teams_url") % team)
             if response.status_code != 200:
@@ -209,6 +210,7 @@ class ApiClient:
                 return
             self.logger.info('Get starting team %s - Ok' % response.status_code)
             response_html = response.text.encode().decode('utf-8-sig')
+            # print(response_html)
             html_parser = StartingTeamParser(team)
             html_parser.feed(response_html)
             starting_teams.append({'team': html_parser.team, 'rival': html_parser.rival,
@@ -218,8 +220,8 @@ class ApiClient:
     def get_teams(self):
         teams = []
         last_week = self.get_last_week_with_points()
-        for team_id in self.config.get("teams"):
         # for team_id in [self.config.get("team_id")]:
+        for team_id in self.config.get("teams"):
             response = requests.get(self.config.get("team_url") % team_id, headers=self.headers)
             if response.status_code != 200:
                 self.logger.error('Get teams %s - Error: %s' % (response.status_code, response.reason))
