@@ -378,11 +378,11 @@ class Database:
                 defenders += 1
                 result.append(player + (goalkeepers + defenders + midfielders + strikers,))
             elif player[4] == 3 and midfielders < 5 and (defenders + midfielders) < 9 and (midfielders + strikers) < 7 \
-                     and (defenders + midfielders + strikers) < 10:
+                    and (defenders + midfielders + strikers) < 10:
                 midfielders += 1
                 result.append(player + (goalkeepers + defenders + midfielders + strikers,))
             elif player[4] == 4 and strikers < 3 and (defenders + strikers) < 7 and (midfielders + strikers) < 7 \
-                     and (defenders + midfielders + strikers) < 10:
+                    and (defenders + midfielders + strikers) < 10:
                 strikers += 1
                 result.append(player + (goalkeepers + defenders + midfielders + strikers,))
             else:
@@ -433,7 +433,7 @@ if __name__ == "__main__":
     # print(database.get_market())
     # database.update_players()
     # print(database.get_players())
-    print(database.get_players_top())
+    # print(database.get_players_top())
     # database.update_points()
     # print(database.get_points())
     # database.update_next_match()
