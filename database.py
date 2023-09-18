@@ -315,8 +315,8 @@ class Database:
             if datetime.fromisoformat(operation['timestamp']) > datetime.fromisoformat(last_operation):
                 if operation['type'] == 'sale':
                     sale_operations.append(operation)
-                elif operation['type'] == 'buyout_updated':
-                    clause_updates.append((operation['player_id'], operation['money'] - operation['previous_money']))
+                # celif operation['type'] == 'buyout_updated':
+                #     clause_updates.append((operation['player_id'], operation['money'] - operation['previous_money']))
                 elif operation['type'] == 'purchase':
                     buy_operations.append((operation['player_id'], operation['name'], operation['pos'],
                                            operation['timestamp'], operation['money'], operation['to_from']))
