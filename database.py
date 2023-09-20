@@ -215,7 +215,7 @@ class Database:
             index = value_list.index(row[12]) + 1
             buy_value = None if row[4] is None else '{0:.2f}'.format(round(row[4] / 1000000, 2))
             benefit = None if row[4] is None else '{0:.2f}'.format(round((row[5] - row[4] - row[8]) / 1000000, 2))
-            perc_ben = None if row[4] is None else round((row[5] - row[4] - row[8]) * 100 / (row[4] - row[8]))
+            perc_ben = None if row[4] is None else round((row[5] - row[4] - row[8]) * 100 / (row[4] + row[8]))
             clause_secs = round((datetime.fromisoformat(row[7]) - datetime.now(timezone.utc)).total_seconds())
             clause = '{0:.2f}'.format(round(row[6] / 1000000, 2))
             if clause_secs > 86400:
