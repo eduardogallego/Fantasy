@@ -219,6 +219,18 @@ def update_team():
     return redirect("/team")
 
 
+@app.route('/update_all', methods=['GET'])
+def update_all():
+    database = Database(config)
+    database.update_next_match()
+    database.update_operations()
+    database.update_players()
+    database.update_market()
+    database.update_points()
+    database.update_teams()
+    return redirect("/team")
+
+
 @app.route('/favicon.ico', methods=['GET'])
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'images'),
