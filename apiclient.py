@@ -67,6 +67,40 @@ class ApiClient:
                        'token_type': response_dict['token_type']}, outfile)
         self.logger.info('Authentication Ok: %s' % response.status_code)
 
+    def get_average_value(self, player_id, last_week):
+        response = requests.get(self.config.get("player_url") % player_id, headers=self.headers)
+        if response.status_code != 200:
+            self.logger.error('Get average value %s %s - Error: %s'
+                              % (player_id, response.status_code, response.reason))
+            return
+        response_list = json.loads(response.text.encode().decode('utf-8-sig'))
+        self.logger.info('Get average value %s %s - Ok' % (player_id, response.status_code))
+        team = response_list['team']['slug']
+        total_points = response_list['points']
+        last_5_matches = [i for i in range(1, last_week + 1)]
+        if team in ['atletico-de-madrid', 'sevilla-fc']:
+            last_5_matches.remove(4)
+        last_5_matches = last_5_matches[-5:]
+        played_matches = 0
+        non_peak_matches_points = []
+        last_5_matches_points = []
+        for stat in response_list['playerStats']:
+            if stat['stats']['mins_played'][0] > 0:
+                played_matches += 1
+                non_peak_matches_points.append(stat['totalPoints'])
+            if stat['weekNumber'] in last_5_matches:
+                last_5_matches_points.append(stat['totalPoints'])
+        points_per_match = round(total_points * 100 / played_matches) if played_matches > 0 else 0
+        peaks = int((played_matches + 2) / 5)
+        non_peak_matches_points.sort()
+        non_peak_matches_points = non_peak_matches_points[peaks: len(non_peak_matches_points) - peaks]
+        non_peak_matches_mean = round(sum(non_peak_matches_points) * 100 / len(non_peak_matches_points)) \
+            if played_matches > 0 else 0
+        last_5_matches_mean = round(sum(last_5_matches_points) * 100 / len(last_5_matches)) \
+            if played_matches > 0 else 0
+        average = round((points_per_match + last_5_matches_mean + non_peak_matches_mean) / 3)
+        return played_matches, average
+
     def get_last_week_with_points(self):
         # return 5
         response = requests.get(self.config.get("config_url"), headers=self.headers)
@@ -87,6 +121,7 @@ class ApiClient:
             return
         response_dict = json.loads(response.text.encode().decode('utf-8-sig'))
         self.logger.info('Get market %s - Ok' % response.status_code)
+        last_week = self.get_last_week_with_points()
         response = []
         for entry in response_dict:
             position = entry['playerMaster']['positionId']
@@ -98,18 +133,17 @@ class ApiClient:
             status = entry['playerMaster']['playerStatus']
             value = entry['playerMaster']['marketValue']
             points = entry['playerMaster']['points']
-            avg_points = entry['playerMaster']['averagePoints']
             bids = entry['numberOfBids'] if 'numberOfBids' in entry else None
             my_bid = entry['bid']['money'] if 'bid' in entry else None
             seller = entry['sellerTeam']['manager']['managerName'] if 'sellerTeam' in entry else None
             market_variation_3d = self.get_market_variation_3d(player_id)
+            played_matches, avg_points = self.get_average_value(player_id, last_week)
             response.append((player, team, position, status, value, market_variation_3d,
-                             points, avg_points, bids, my_bid, seller))
+                             points, played_matches, avg_points, bids, my_bid, seller))
         return response
 
     def get_market_variation_3d(self, player_id):
         response = requests.get(self.config.get("market_value_url") % player_id, headers=self.headers)
-        time.sleep(0.2)
         if response.status_code != 200:
             self.logger.error('Get market variation 3d %s %s - Error: %s'
                               % (player_id, response.status_code, response.reason))
@@ -218,6 +252,7 @@ class ApiClient:
         return starting_teams
 
     def get_teams(self):
+        ini_tt = round(time.time() * 1000)
         teams = []
         last_week = self.get_last_week_with_points()
         # for team_id in [self.config.get("team_id")]:
@@ -243,40 +278,21 @@ class ApiClient:
                 clause = player['buyoutClause']
                 clause_tt = player['buyoutClauseLockedEndTime']
                 total_points = player['playerMaster']['points']
-                last_stats = player['playerMaster']['lastStats']
-                last_5_matches = [i for i in range(1, last_week + 1)]
-                if team in ['atletico-de-madrid', 'sevilla-fc']:
-                    last_5_matches.remove(4)
-                last_5_matches = last_5_matches[-5:]
-                played_matches = 0
-                non_peak_matches_points = []
-                last_5_matches_points = []
-                for stat in last_stats:
-                    if stat['stats']['mins_played'][0] > 0:
-                        played_matches += 1
-                        non_peak_matches_points.append(stat['totalPoints'])
-                    if stat['weekNumber'] in last_5_matches:
-                        last_5_matches_points.append(stat['totalPoints'])
-                points_per_match = round(total_points * 100 / played_matches) if played_matches > 0 else 0
-                peaks = int((played_matches + 2) / 5)
-                non_peak_matches_points.sort()
-                non_peak_matches_points = non_peak_matches_points[peaks: len(non_peak_matches_points) - peaks]
-                non_peak_matches_mean = round(sum(non_peak_matches_points) * 100 / len(non_peak_matches_points)) \
-                    if played_matches > 0 else 0
-                last_5_matches_mean = round(sum(last_5_matches_points) * 100 / len(last_5_matches)) \
-                    if played_matches > 0 else 0
-                average = round((points_per_match + last_5_matches_mean + non_peak_matches_mean) / 3)
+                played_matches, average = self.get_average_value(player_id, last_week)
                 percent_change_3d = self.get_market_variation_3d(player_id)
                 players.append((player_id, name, team, position, status, value, percent_change_3d,
                                 clause, clause_tt, total_points, played_matches, average))
             teams.append({'id': team_id, 'manager': manager, 'money': team_money,
                           'value': team_value, 'points': team_points, 'players': players})
+        delta_ms = round(time.time() * 1000) - ini_tt
+        print("Delta get_teams %d ms" % delta_ms)
         return teams
 
 
 if __name__ == "__main__":
     configuration = Config()
     api_client = ApiClient(configuration)
+    # print(json.dumps(api_client.get_average_value('58', 6)))
     # print(json.dumps(api_client.get_market()))
     # print(json.dumps(api_client.get_market_variation_3d('58')))
     # print(json.dumps(api_client.get_operations()))

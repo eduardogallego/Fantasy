@@ -8,6 +8,7 @@ CREATE TABLE market (
   buy_value INTEGER NOT NULL,
   percent_change_3d INTEGER NOT NULL,
   points INTEGER NOT NULL,
+  matches INTEGER NOT NULL,
   average INTEGER NOT NULL,
   bids INTEGER,
   myBid INTEGER,

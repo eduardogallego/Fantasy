@@ -26,23 +26,24 @@ class Database:
 
     def get_market(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT name, m.team, pos, status, buy_value, percent_change_3d, "
-                       "points, average, bids, myBid, seller, rival, inout, percentage "
+        cursor.execute("SELECT name, m.team, pos, status, buy_value, percent_change_3d, points, "
+                       "matches, average, bids, myBid, seller, rival, inout, percentage "
                        "FROM market AS m LEFT JOIN next AS n ON m.team = n.team and name = player "
                        "ORDER BY average DESC, percent_change_3d DESC")
         rows = cursor.fetchall()
         result = []
         value_list = []
         for row in rows:
-            value_list.append(row[7])
+            value_list.append(row[8])
         list.sort(value_list, reverse=True)
         for row in rows:
-            index = value_list.index(row[7]) + 1
-            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2], "status": row[3],
-                           "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)), "percent_chg_3d": row[5],
-                           "points": row[6], "average": '{0:.2f}'.format(round(row[7], 2)), "bids": row[8],
-                           "myBid": '{0:.2f}'.format(round(row[9] / 1000000, 2)) if row[9] is not None else None,
-                           "seller": row[10], "tag": 0, "rival": row[11], "inout": row[12], "percentage": row[13]})
+            index = value_list.index(row[8]) + 1
+            result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2],
+                           "status": row[3], "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
+                           "percent_chg_3d": row[5], "points": row[6], "matches": row[7],
+                           "average": '{0:.2f}'.format(round(row[8] / 100, 2)), "bids": row[9],
+                           "myBid": '{0:.2f}'.format(round(row[10] / 1000000, 2)) if row[10] is not None else None,
+                           "seller": row[11], "tag": 0, "rival": row[12], "inout": row[13], "percentage": row[14]})
         return json.dumps(result)
 
     def get_next_match(self):
@@ -286,7 +287,7 @@ class Database:
         market = self.api_client.get_market()
         cursor.execute('DELETE FROM market')
         cursor.executemany('INSERT INTO market(name,team,pos,status,buy_value,percent_change_3d,points,'
-                           'average,bids,myBid,seller) VALUES(?,?,?,?,?,?,?,?,?,?,?)', market)
+                           'matches,average,bids,myBid,seller) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', market)
         self.connection.commit()
 
     def update_next_match(self):
