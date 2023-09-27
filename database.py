@@ -40,6 +40,7 @@ class Database:
             index = value_list.index(row[8]) + 1
             result.append({"index": index, "player": row[0], "team": row[1], "pos": row[2],
                            "status": row[3], "buy_value": '{0:.2f}'.format(round(row[4] / 1000000, 2)),
+                           "change_3d": '{0:.2f}'.format(round(row[5] * row[4] / 100000000, 2)),
                            "percent_chg_3d": row[5], "points": row[6], "matches": row[7],
                            "average": '{0:.2f}'.format(round(row[8] / 100, 2)), "bids": row[9],
                            "myBid": '{0:.2f}'.format(round(row[10] / 1000000, 2)) if row[10] is not None else None,
