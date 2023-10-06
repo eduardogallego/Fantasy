@@ -17,17 +17,17 @@ html {
 }
 
 .bootstrap-table .fixed-table-container .table thead th .sortable {
-    padding-right: 16px!important;
+    padding-right: 15px!important;
 }
 
 .index {
-    padding-right: 4px !important;
+    padding-right: 3px !important;
     text-align: right;
     width: 30px;
 }
 
 .tag {
-    width: 20px;
+    width: 16px;
 }
 
 .left {
@@ -81,7 +81,7 @@ html {
     font-size: 0.8em;
     height: 17px;
     text-align: center;
-    width: 20px;
+    width: 16px;
 }
 .pos-1 {
     background-color: red;
