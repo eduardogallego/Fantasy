@@ -80,6 +80,8 @@ class ApiClient:
         last_5_matches = [i for i in range(1, last_week + 1)]
         if team in ['atletico-de-madrid', 'sevilla-fc']:
             last_5_matches.remove(4)
+        elif team in ['rcd-mallorca', 'cadiz-cf']:
+            last_5_matches.remove(13)
         last_5_matches = last_5_matches[-5:]
         played_matches = 0
         non_peak_matches_points = []
@@ -292,7 +294,7 @@ class ApiClient:
 if __name__ == "__main__":
     configuration = Config()
     api_client = ApiClient(configuration)
-    # print(json.dumps(api_client.get_average_value('58', 6)))
+    # print(json.dumps(api_client.get_average_value('666', 13)))
     # print(json.dumps(api_client.get_market()))
     # print(json.dumps(api_client.get_market_variation_3d('58')))
     # print(json.dumps(api_client.get_operations()))
