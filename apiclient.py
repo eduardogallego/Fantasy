@@ -75,13 +75,13 @@ class ApiClient:
             return
         response_list = json.loads(response.text.encode().decode('utf-8-sig'))
         self.logger.info('Get average value %s %s - Ok' % (player_id, response.status_code))
-        team = response_list['team']['slug']
         total_points = response_list['points']
         last_5_matches = [i for i in range(1, last_week + 1)]
+        '''team = response_list['team']['slug']
         if team in ['atletico-de-madrid', 'sevilla-fc']:
             last_5_matches.remove(4)
         elif team in ['rcd-mallorca', 'cadiz-cf']:
-            last_5_matches.remove(13)
+            last_5_matches.remove(13)'''
         last_5_matches = last_5_matches[-5:]
         played_matches = 0
         non_peak_matches_points = []
