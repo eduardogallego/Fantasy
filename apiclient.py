@@ -77,8 +77,8 @@ class ApiClient:
         self.logger.info('Get average value %s %s - Ok' % (player_id, response.status_code))
         total_points = response_list['points']
         last_5_matches = [i for i in range(1, last_week + 1)]
-        team = response_list['team']['slug']
-        '''if team in ['atletico-de-madrid', 'fc-barcelona', 'c-a-osasuna',
+        '''team = response_list['team']['slug']
+        if team in ['atletico-de-madrid', 'fc-barcelona', 'c-a-osasuna',
                     'getafe-cf', 'rayo-vallecano', 'real-madrid']:
             last_5_matches.remove(20)
         if team in ['atletico-de-madrid', 'sevilla-fc']:
