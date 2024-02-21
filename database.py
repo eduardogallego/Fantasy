@@ -22,7 +22,7 @@ class Database:
         try:
             self.connection = sqlite3.connect(self.db_file)
         except Error as e:
-            self.logger.ERROR("Database Error: " + e)
+            self.logger.error("Database Error: " + str(e))
 
     def get_market(self):
         cursor = self.connection.cursor()
