@@ -68,7 +68,7 @@ class StartingTeamParser(HTMLParser):
         'real-sociedad_Ali Cho': 'Momo Cho', 'real-sociedad_Marín': 'Pablo Marín', 'real-sociedad_Galán': 'Javi Galán',
         'sevilla_En Nesyri': 'En-Nesyri', 'sevilla_Jordan': 'Jordán', 'sevilla_Lukebakio': 'Lukébakio',
         'sevilla_Marcão': 'Marcao', 'sevilla_Rakitic': 'Rakitić', 'sevilla_Óliver': 'Óliver Torres',
-        'sevilla_Ramos': 'Sergio Ramos',
+        'sevilla_Ramos': 'Sergio Ramos', 'sevilla_Romero': 'Isaac',
         'valencia_Javi Guerra': 'Guerra', 'valencia_Duro': 'Hugo Duro', 'valencia_Gayà': 'Gayá',
         'valencia_Gabriel': 'Gabriel Paulista', 'valencia_Alberto Marí': 'Marí', 'valencia_Cristhian': 'Mosquera',
         'valencia_Yaremchuk': 'Roman Yaremchuk', 'valencia_Thierry': 'Thierry Correia', 'valencia_Özkacar': 'Cenk',
